@@ -17,29 +17,58 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-
+import { useRouter } from "next/navigation";
 import { login, getUserMe, UserData } from "../../../api/auth/signinClient";
 
 const SigninForm = () => {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
 
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  // ✅ Validation rules
+  const validateForm = () => {
+    let valid = true;
+    setEmailError("");
+    setPasswordError("");
+
+    if (!email.trim()) {
+      setEmailError("Email should not be empty");
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Email must be a valid email address");
+      valid = false;
+    }
+
+    if (!password.trim()) {
+      setPasswordError("Password should not be empty");
+      valid = false;
+    } else if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      valid = false;
+    }
+
+    return valid;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!validateForm()) return; // stop if invalid
+
     setLoading(true);
 
     try {
       const token = await login(email, password);
       const user = await getUserMe(token);
-
       setUserData(user);
       setOpenDialog(true);
     } catch (err: unknown) {
@@ -49,6 +78,11 @@ const SigninForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+    router.push("/"); // redirect to homepage or dashboard
   };
 
   return (
@@ -98,6 +132,7 @@ const SigninForm = () => {
           onSubmit={handleSubmit}
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
+          {/* Email */}
           <FormControl>
             <FormLabel htmlFor="email">Email</FormLabel>
             <TextField
@@ -115,6 +150,7 @@ const SigninForm = () => {
             />
           </FormControl>
 
+          {/* Password */}
           <FormControl>
             <FormLabel htmlFor="password">Password</FormLabel>
             <TextField
@@ -132,8 +168,13 @@ const SigninForm = () => {
             />
           </FormControl>
 
-          <Button type="submit" fullWidth variant="contained" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
         </Box>
 
@@ -148,7 +189,7 @@ const SigninForm = () => {
       </Card>
 
       {/* ✅ Dialog showing user info */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>Login Successful</DialogTitle>
         <DialogContent dividers>
           {userData && (
@@ -163,7 +204,7 @@ const SigninForm = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Close</Button>
+          <Button onClick={handleDialogClose}>Go to Home</Button>
         </DialogActions>
       </Dialog>
     </Container>
