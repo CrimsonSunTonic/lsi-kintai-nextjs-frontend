@@ -3,7 +3,7 @@ export interface UserData {
   email: string;
   firstname: string;
   lastname: string;
-  role: "admin" | "user";
+  role: "ADMIN" | "USER";
 }
 
 const API_BASE = "http://localhost:4000";

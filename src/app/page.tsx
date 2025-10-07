@@ -21,8 +21,13 @@ export default function HomePage() {
       // Has token → verify it with backend
       const user = await getUserClient();
       if (user) {
-        // logged in → go to attendance page
-        router.replace("/user/attendance");
+
+        // Redirect based on role
+        if (user.role === "ADMIN") {
+          router.replace("/admin/");
+        } else {
+          router.replace("/user/attendance");
+        }
       } else {
         // invalid token → redirect to signin
         localStorage.removeItem("access_token");

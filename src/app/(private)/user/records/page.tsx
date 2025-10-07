@@ -12,6 +12,7 @@ import {
   TableBody,
   Paper,
   Alert,
+  Container,
 } from "@mui/material";
 import { getAttendanceClient, AttendanceRecord } from "@/api/attendance/getAttendanceClient";
 
@@ -33,49 +34,58 @@ export default function UserRecordsPage() {
   }, []);
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Typography variant="h4" mb={3} fontWeight="bold" color="primary">
-        Attendance Records
-      </Typography>
+    <Container
+        maxWidth="xl"
+        sx={{
+            width: "100%",       // full width
+            maxWidth: "1600px",  // or whatever max width you want
+            px: 3,               // horizontal padding
+        }}
+    >
+        <Box sx={{ p: 4 }}>
+        <Typography variant="h4" mb={3} fontWeight="bold" color="primary">
+            Attendance Records
+        </Typography>
 
-      {error && <Alert severity="warning">{error}</Alert>}
+        {error && <Alert severity="warning">{error}</Alert>}
 
-      {!error && (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Date & Time</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Latitude</TableCell>
-                <TableCell>Longitude</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {records.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>{record.id}</TableCell>
-                  <TableCell>{new Date(record.date).toLocaleString()}</TableCell>
-                  <TableCell
-                    style={{
-                      color: record.status === "checkin" ? "green" : "red",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {record.status.toUpperCase()}
-                  </TableCell>
-                  <TableCell>{record.latitude.toFixed(4)}</TableCell>
-                  <TableCell>{record.longitude.toFixed(4)}</TableCell>
+        {!error && (
+            <TableContainer component={Paper}>
+            <Table>
+                <TableHead>
+                <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Date & Time</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Latitude</TableCell>
+                    <TableCell>Longitude</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                </TableHead>
 
-      {loading && !error && <Typography mt={2}>Loading records...</Typography>}
-    </Box>
+                <TableBody>
+                {records.map((record) => (
+                    <TableRow key={record.id}>
+                    <TableCell>{record.id}</TableCell>
+                    <TableCell>{new Date(record.date).toLocaleString()}</TableCell>
+                    <TableCell
+                        style={{
+                        color: record.status === "checkin" ? "green" : "red",
+                        fontWeight: "bold",
+                        }}
+                    >
+                        {record.status.toUpperCase()}
+                    </TableCell>
+                    <TableCell>{record.latitude.toFixed(4)}</TableCell>
+                    <TableCell>{record.longitude.toFixed(4)}</TableCell>
+                    </TableRow>
+                ))}
+                </TableBody>
+            </Table>
+            </TableContainer>
+        )}
+
+        {loading && !error && <Typography mt={2}>Loading records...</Typography>}
+        </Box>
+    </Container>
   );
 }

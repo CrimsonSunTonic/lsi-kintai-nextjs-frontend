@@ -28,9 +28,10 @@ const AppHeader = ({ user }: { user: UserData }) => {
     localStorage.removeItem("access_token");
     router.push("/signin");
   };
+  console.log("User Role:", user.role); // Debugging line
 
   const menuItems =
-    user.role === "admin" ? ["Employees", "Records"] : ["Attendance", "Records"];
+    user.role === "ADMIN" ? ["Employees", "Records"] : ["Attendance", "Records"];
 
   return (
     <AppBar
@@ -42,7 +43,14 @@ const AppHeader = ({ user }: { user: UserData }) => {
         color: "black",
       }}
     >
-      <Container maxWidth="lg">
+      <Container
+        maxWidth="xl"
+        sx={{
+          width: "100%",      
+          maxWidth: "1600px",
+          px: 3,              
+        }}
+      >
         <Toolbar variant="dense" disableGutters sx={{ justifyContent: "space-between" }}>
           {/* Left Section */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -57,7 +65,7 @@ const AppHeader = ({ user }: { user: UserData }) => {
                   color="inherit"
                   onClick={() =>
                     router.push(
-                      user.role === "admin"
+                      user.role === "ADMIN"
                         ? `/admin/${item.toLowerCase()}`
                         : `/user/${item.toLowerCase()}`
                     )
@@ -94,7 +102,7 @@ const AppHeader = ({ user }: { user: UserData }) => {
                     key={item}
                     onClick={() =>
                       router.push(
-                        user.role === "admin"
+                        user.role === "ADMIN"
                           ? `/admin/${item.toLowerCase()}`
                           : `/user/${item.toLowerCase()}`
                       )
