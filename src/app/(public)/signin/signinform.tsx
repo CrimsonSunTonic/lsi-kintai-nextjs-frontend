@@ -12,13 +12,9 @@ import {
   Typography,
   Container,
   Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { login, UserData } from "@/api/auth/signinClient";
+import { login } from "@/api/auth/signinClient";
 import { getUserClient } from "@/api/auth/getUserClient";
 
 const SigninForm = () => {
@@ -30,8 +26,6 @@ const SigninForm = () => {
   const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [openDialog, setOpenDialog] = useState(false);
 
   // ✅ Form validation
   const validateForm = () => {
@@ -58,7 +52,6 @@ const SigninForm = () => {
     return valid;
   };
 
-  // ✅ Handle Sign In
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -70,9 +63,8 @@ const SigninForm = () => {
     try {
       const token = await login(email, password);
       localStorage.setItem("access_token", token);
-      const user = await getUserClient(); // ✅ use getUserClient instead of getUserMe
-      setUserData(user);
-      setOpenDialog(true);
+      await getUserClient();
+      router.push("/");
     } catch (err: unknown) {
       console.error("Login error:", err);
       if (err instanceof Error) setError(err.message);
@@ -80,11 +72,6 @@ const SigninForm = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDialogClose = () => {
-    setOpenDialog(false);
-    router.push("/");
   };
 
   return (
@@ -175,6 +162,7 @@ const SigninForm = () => {
             fullWidth
             variant="contained"
             disabled={loading}
+            sx={{ py: 1.2, fontSize: "1rem", fontWeight: 600 }}
           >
             {loading ? "Signing in..." : "Sign In"}
           </Button>
@@ -189,26 +177,6 @@ const SigninForm = () => {
           </Typography>
         </Box>
       </Card>
-
-      {/* ✅ Dialog showing user info */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>Login Successful</DialogTitle>
-        <DialogContent dividers>
-          {userData && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography>ID: {userData.id}</Typography>
-              <Typography>Email: {userData.email}</Typography>
-              <Typography>
-                Name: {userData.firstname} {userData.lastname}
-              </Typography>
-              <Typography>Role: {userData.role}</Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>Go to Home</Button>
-        </DialogActions>
-      </Dialog>
     </Container>
   );
 };
