@@ -18,32 +18,46 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { signup, SignupData } from "../../../api/auth/signupClient";
+import { signup } from "../../../api/auth/signupClient";
 
 const SignupForm = () => {
   const router = useRouter();
 
+  // 🔹 Form fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
 
+  // 🔹 Error states
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [repeatPasswordError, setRepeatPasswordError] = useState("");
   const [firstnameError, setFirstnameError] = useState("");
   const [lastnameError, setLastnameError] = useState("");
   const [error, setError] = useState("");
 
+  // 🔹 Loading and dialog
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState<SignupData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
+
+  // ✅ Live password matching validation
+  const handleRepeatPasswordChange = (value: string) => {
+    setRepeatPassword(value);
+    if (password && value && value !== password) {
+      setRepeatPasswordError("Passwords do not match");
+    } else {
+      setRepeatPasswordError("");
+    }
+  };
 
   // ✅ Validate fields before signup
   const validateForm = () => {
     let valid = true;
-
     setEmailError("");
     setPasswordError("");
+    setRepeatPasswordError("");
     setFirstnameError("");
     setLastnameError("");
 
@@ -60,6 +74,14 @@ const SignupForm = () => {
       valid = false;
     } else if (password.length < 8) {
       setPasswordError("Password must be at least 8 characters long");
+      valid = false;
+    }
+
+    if (!repeatPassword.trim()) {
+      setRepeatPasswordError("Please confirm your password");
+      valid = false;
+    } else if (repeatPassword !== password) {
+      setRepeatPasswordError("Passwords do not match");
       valid = false;
     }
 
@@ -80,12 +102,11 @@ const SignupForm = () => {
     e.preventDefault();
     setError("");
 
-    if (!validateForm()) return; // stop if validation fails
+    if (!validateForm()) return;
 
     setLoading(true);
     try {
-      const user = await signup(email, password, firstname, lastname);
-      setUserData(user);
+      await signup(email, password, firstname, lastname);
       setOpenDialog(true);
     } catch (err: unknown) {
       console.error("Signup error:", err);
@@ -128,9 +149,9 @@ const SignupForm = () => {
           variant="h4"
           sx={{
             textAlign: "center",
-            width: "100%",
             fontSize: "clamp(2rem, 10vw, 2.15rem)",
             mb: 2,
+            fontWeight: "bold",
           }}
         >
           Sign Up
@@ -149,22 +170,17 @@ const SignupForm = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            width: "100%",
             gap: 2,
           }}
         >
-          {/* Email */}
           <FormControl>
-            <FormLabel htmlFor="email">Email</FormLabel>
+            <FormLabel>Email</FormLabel>
             <TextField
-              id="email"
               type="email"
-              name="email"
               placeholder="your@email.com"
               autoComplete="email"
-              required
               fullWidth
-              variant="outlined"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={!!emailError}
@@ -172,18 +188,14 @@ const SignupForm = () => {
             />
           </FormControl>
 
-          {/* Password */}
           <FormControl>
-            <FormLabel htmlFor="password">Password</FormLabel>
+            <FormLabel>Password</FormLabel>
             <TextField
-              id="password"
-              name="password"
               type="password"
-              placeholder="••••••"
+              placeholder="••••••••"
               autoComplete="new-password"
-              required
               fullWidth
-              variant="outlined"
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               error={!!passwordError}
@@ -191,17 +203,26 @@ const SignupForm = () => {
             />
           </FormControl>
 
-          {/* First Name */}
           <FormControl>
-            <FormLabel htmlFor="firstname">First Name</FormLabel>
+            <FormLabel>Repeat Password</FormLabel>
             <TextField
-              id="firstname"
-              name="firstname"
-              placeholder="Enter your first name"
-              autoComplete="given-name"
-              required
+              type="password"
+              placeholder="Re-enter your password"
               fullWidth
-              variant="outlined"
+              required
+              value={repeatPassword}
+              onChange={(e) => handleRepeatPasswordChange(e.target.value)}
+              error={!!repeatPasswordError}
+              helperText={repeatPasswordError}
+            />
+          </FormControl>
+
+          <FormControl>
+            <FormLabel>First Name</FormLabel>
+            <TextField
+              placeholder="Enter your first name"
+              fullWidth
+              required
               value={firstname}
               onChange={(e) => setFirstname(e.target.value)}
               error={!!firstnameError}
@@ -209,17 +230,12 @@ const SignupForm = () => {
             />
           </FormControl>
 
-          {/* Last Name */}
           <FormControl>
-            <FormLabel htmlFor="lastname">Last Name</FormLabel>
+            <FormLabel>Last Name</FormLabel>
             <TextField
-              id="lastname"
-              name="lastname"
               placeholder="Enter your last name"
-              autoComplete="family-name"
-              required
               fullWidth
-              variant="outlined"
+              required
               value={lastname}
               onChange={(e) => setLastname(e.target.value)}
               error={!!lastnameError}
@@ -235,7 +251,7 @@ const SignupForm = () => {
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <Typography variant="body2">
             Already have an account?{" "}
-            <Link href="/signin" variant="body2">
+            <Link href="/signin" underline="hover">
               Log in
             </Link>
           </Typography>
@@ -244,21 +260,28 @@ const SignupForm = () => {
 
       {/* ✅ Success Dialog */}
       <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>Signup Successful</DialogTitle>
-        <DialogContent dividers>
-          {userData && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography>ID: {userData.id}</Typography>
-              <Typography>Email: {userData.email}</Typography>
-              <Typography>
-                Name: {userData.firstname} {userData.lastname}
-              </Typography>
-              <Typography>Role: {userData.role}</Typography>
-            </Box>
-          )}
+        <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>
+          🎉 Signup Successful!
+        </DialogTitle>
+        <DialogContent
+          dividers
+          sx={{
+            textAlign: "center",
+            fontSize: "1.1rem",
+            color: "text.secondary",
+          }}
+        >
+          Your account has been created successfully.
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>Go to Sign In</Button>
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDialogClose}
+            sx={{ px: 4 }}
+          >
+            Go to Sign In
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

@@ -116,7 +116,7 @@ const AppHeader = ({ user }: { user: UserData }) => {
             <Typography
               sx={{ fontWeight: 600, fontSize: "1.15rem", color: "#555555" }}
             >
-              Hi, {user.firstname} {user.lastname}
+              {user.firstname} {user.lastname}
             </Typography>
             <Button
               variant="outlined"
