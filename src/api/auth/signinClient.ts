@@ -30,17 +30,3 @@ export async function login(email: string, password: string): Promise<string> {
 
   return data.access_token;
 }
-
-export async function getUserMe(token: string): Promise<UserData> {
-  const res = await fetch(`${API_BASE}/user/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || "Failed to get user info");
-  }
-
-  return data;
-}

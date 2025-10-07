@@ -18,14 +18,14 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { login, getUserMe, UserData } from "../../../api/auth/signinClient";
+import { login, UserData } from "@/api/auth/signinClient";
+import { getUserClient } from "@/api/auth/getUserClient";
 
 const SigninForm = () => {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
@@ -33,7 +33,7 @@ const SigninForm = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
 
-  // ✅ Validation rules
+  // ✅ Form validation
   const validateForm = () => {
     let valid = true;
     setEmailError("");
@@ -58,17 +58,19 @@ const SigninForm = () => {
     return valid;
   };
 
+  // ✅ Handle Sign In
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!validateForm()) return; // stop if invalid
+    if (!validateForm()) return;
 
     setLoading(true);
 
     try {
       const token = await login(email, password);
-      const user = await getUserMe(token);
+      localStorage.setItem("access_token", token);
+      const user = await getUserClient(); // ✅ use getUserClient instead of getUserMe
       setUserData(user);
       setOpenDialog(true);
     } catch (err: unknown) {
@@ -82,7 +84,7 @@ const SigninForm = () => {
 
   const handleDialogClose = () => {
     setOpenDialog(false);
-    router.push("/"); // redirect to homepage or dashboard
+    router.push("/");
   };
 
   return (
