@@ -17,7 +17,8 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { useRouter } from "next/navigation";
-import type { UserData } from "../api/auth/getUserClient";
+import type { UserData } from "@/api/auth/getUserClient";
+import Image from "next/image";
 
 const AppHeader = ({ user }: { user: UserData }) => {
   const [open, setOpen] = useState(false);
@@ -31,7 +32,9 @@ const AppHeader = ({ user }: { user: UserData }) => {
   };
 
   const menuItems =
-    user.role === "ADMIN" ? ["Employees", "Records"] : ["Attendance", "Records"];
+    user.role === "ADMIN"
+      ? [{ label: "勤怠管理・履歴", path: "/admin/records" }]
+      : [{ label: "勤怠登録", path: "/user/attendance" }];
 
   return (
     <AppBar
@@ -60,48 +63,38 @@ const AppHeader = ({ user }: { user: UserData }) => {
         >
           {/* Left Section */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: "bold",
-                letterSpacing: 1,
-                color: "#1976d2",
-              }}
-            >
-              LSI 勤怠システム
-            </Typography>
+              <Image
+                src="/logo.png"
+                alt="LSI Logo"
+                width={50}
+                height={50}
+                priority
+              />
 
             {/* Desktop Menu */}
             <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
               {menuItems.map((item) => (
                 <Button
-                  key={item}
+                  key={item.label}
                   color="primary"
                   sx={{
                     textTransform: "none",
-                    fontWeight: 600,       // bolder text
-                    fontSize: "1.15rem",   // bigger font size
-                    px: 3,                 // horizontal padding
-                    py: 1.2,               // vertical padding
+                    fontWeight: 600,
+                    fontSize: "1.75rem",
+                    px: 3,
+                    py: 1.2,
                     "&:hover": {
                       bgcolor: "#e3f2fd",
                       color: "#1976d2",
                     },
                   }}
-                  onClick={() =>
-                    router.push(
-                      user.role === "ADMIN"
-                        ? `/admin/${item.toLowerCase()}`
-                        : `/user/${item.toLowerCase()}`
-                    )
-                  }
+                  onClick={() => router.push(item.path)}
                 >
-                  {item}
+                  {item.label}
                 </Button>
               ))}
             </Box>
           </Box>
-
           {/* Right Section */}
           <Box
             sx={{
@@ -165,14 +158,8 @@ const AppHeader = ({ user }: { user: UserData }) => {
               </Box>
               {menuItems.map((item) => (
                 <MenuItem
-                  key={item}
-                  onClick={() =>
-                    router.push(
-                      user.role === "ADMIN"
-                        ? `/admin/${item.toLowerCase()}`
-                        : `/user/${item.toLowerCase()}`
-                    )
-                  }
+                  key={item.label}
+                  onClick={() => router.push(item.path)}
                   sx={{
                     borderRadius: 1,
                     mb: 1,
@@ -181,7 +168,7 @@ const AppHeader = ({ user }: { user: UserData }) => {
                     },
                   }}
                 >
-                  {item}
+                  {item.label}
                 </MenuItem>
               ))}
               <Divider sx={{ my: 2 }} />

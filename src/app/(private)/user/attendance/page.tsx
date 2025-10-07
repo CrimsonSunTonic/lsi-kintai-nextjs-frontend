@@ -60,7 +60,7 @@ export default function AttendancePage() {
           fontWeight="bold"
           sx={{ textTransform: "uppercase", letterSpacing: 1 }}
         >
-          Attendance Check
+          勤怠システム
         </Typography>
 
         <Stack direction="column" spacing={4} alignItems="center">
@@ -71,7 +71,7 @@ export default function AttendancePage() {
             sx={{ width: 200, py: 2, fontSize: "1.25rem", borderRadius: 3 }}
             onClick={() => handleAttendance("checkin")}
           >
-            Check In
+            出勤
           </Button>
 
           <Button
@@ -81,7 +81,7 @@ export default function AttendancePage() {
             sx={{ width: 200, py: 2, fontSize: "1.25rem", borderRadius: 3 }}
             onClick={() => handleAttendance("checkout")}
           >
-            Check Out
+            退勤
           </Button>
         </Stack>
 
