@@ -3,21 +3,28 @@ import { Container, Typography } from "@mui/material";
 export default function AdminPage() {
   return (
     <Container
-        maxWidth="xl"
-        sx={{
-            width: "100%",       // full width
-            maxWidth: "1600px",  // or whatever max width you want
-            px: 3,               // horizontal padding
-        }}
+      maxWidth="xl"
+      sx={{
+        width: "100%",
+        maxWidth: "1600px",
+        px: 3,
+        minHeight: "80vh", // gives vertical space
+        display: "flex",
+        justifyContent: "center", // horizontal center
+        alignItems: "center", // vertical center
+        flexDirection: "column", // stack items vertically if needed
+        textAlign: "center", // center text
+      }}
     >
-        <Typography
+      <Typography
         variant="h3"
         mb={5}
         color="primary"
         fontWeight="bold"
         sx={{ textTransform: "uppercase", letterSpacing: 1 }}
       >
-        Welcome to the Admin Dashboard
+        管理ページへようこそ！
       </Typography>
-    </Container>);
+    </Container>
+  );
 }
