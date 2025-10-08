@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:4000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export async function fetchAttendanceStatus(): Promise<{ checkedIn: boolean; checkedOut: boolean }> {
   const token = localStorage.getItem("access_token");

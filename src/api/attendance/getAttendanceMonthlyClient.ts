@@ -1,3 +1,5 @@
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export async function getAttendanceMonthlyClient(
   userId: number,
   month: number,
@@ -10,7 +12,7 @@ export async function getAttendanceMonthlyClient(
   formData.append("month", String(month));
   formData.append("year", String(year));
 
-  const res = await fetch("http://localhost:4000/attendance/monthly", {
+  const res = await fetch(`${API_BASE}/attendance/monthly`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

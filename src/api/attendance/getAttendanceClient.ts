@@ -9,7 +9,7 @@ export interface AttendanceRecord {
   longitude: number;
 }
 
-const API_BASE = "http://localhost:4000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getAttendanceClient(): Promise<AttendanceRecord[]> {
   const token = localStorage.getItem("access_token");
