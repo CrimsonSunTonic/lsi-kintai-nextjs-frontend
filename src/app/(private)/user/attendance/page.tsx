@@ -1,16 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Typography, Box, Alert, Stack, Container } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Box,
+  Stack,
+  Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import { sendAttendance, Attendance } from "@/api/attendance/attendanceClient";
 
 export default function AttendancePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [record, setRecord] = useState<Attendance | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleAttendance = async (status: "checkin" | "checkout") => {
     if (!navigator.geolocation) {
-      setMessage("Geolocation is not supported by your browser.");
+      setMessage("お使いのブラウザは位置情報をサポートしていません。");
+      setOpenDialog(true);
       return;
     }
 
@@ -19,34 +31,43 @@ export default function AttendancePage() {
 
       const res = await sendAttendance(status, latitude, longitude);
       if (res) {
-        const localTime = new Date(res.date).toLocaleString();
+        const timeOnly = new Date(res.date).toLocaleTimeString("ja-JP", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
         setRecord(res);
         setMessage(
-          `✅ ${status.toUpperCase()} recorded at ${localTime}\nLat: ${latitude.toFixed(
-            4
-          )}, Lng: ${longitude.toFixed(4)}`
+          `✅ ${status === "checkin" ? "出勤" : "退勤"} が記録されました。\n記録時刻: ${timeOnly}`,
         );
       } else {
-        setMessage("❌ Failed to record attendance. Try again.");
+        setRecord(null);
+        setMessage("❌ 勤怠の記録に失敗しました。もう一度お試しください。");
       }
+      setOpenDialog(true);
     });
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setMessage(null);
   };
 
   return (
     <Container
       maxWidth="xl"
       sx={{
-        width: "100%",       // full width
-        maxWidth: "1600px",  // or whatever max width you want
-        px: 3,               // horizontal padding
+        width: "100%",
+        maxWidth: "1600px",
+        px: 3,
       }}
     >
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center", // vertical center
-          alignItems: "center", // horizontal center
+          justifyContent: "center",
+          alignItems: "center",
           minHeight: "100vh",
           textAlign: "center",
           backgroundColor: "#f9fafb",
@@ -85,20 +106,21 @@ export default function AttendancePage() {
           </Button>
         </Stack>
 
-        {message && (
-          <Alert
-            severity={record ? "success" : "error"}
-            sx={{
-              mt: 5,
-              width: "80%",
-              maxWidth: 500,
-              whiteSpace: "pre-line",
-              fontSize: "1rem",
-            }}
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>
+            {record ? "✅ 勤怠が記録されました" : "❌ エラー"}
+          </DialogTitle>
+          <DialogContent
+            sx={{ whiteSpace: "pre-line", fontSize: "1rem", mt: 1 }}
           >
             {message}
-          </Alert>
-        )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} autoFocus>
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Container>
   );

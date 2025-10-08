@@ -17,7 +17,7 @@ export async function sendAttendance(
   longitude: number
 ): Promise<Attendance | null> {
   const token = localStorage.getItem("access_token");
-  if (!token) return null;
+    if (!token) return null;
 
   try {
     const res = await fetch(`${API_BASE}/attendance`, {

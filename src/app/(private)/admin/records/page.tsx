@@ -13,79 +13,202 @@ import {
   Paper,
   Alert,
   Container,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
 } from "@mui/material";
-import { getAttendanceClient, AttendanceRecord } from "@/api/attendance/getAttendanceClient";
+import { getAttendanceMonthlyClient } from "@/api/attendance/getAttendanceMonthlyClient";
+import { getAllUsersClient } from "@/api/user/getAllUsersClient";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+
+interface AttendanceRecord {
+  id: number;
+  date: string;
+  status: string;
+  latitude: number;
+  longitude: number;
+}
+
+interface User {
+  id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+}
 
 export default function UserRecordsPage() {
+  const { user, loading: authLoading } = useAdminAuth(); // ✅ check admin
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<number | "">("");
+  const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
+  const [year, setYear] = useState<number>(new Date().getFullYear());
+
+  // ✅ Fetch user list (for admin)
   useEffect(() => {
-    const fetchRecords = async () => {
-      setLoading(true);
-      const data = await getAttendanceClient();
-      if (data.length === 0) setError("No attendance records found or failed to fetch.");
-      setRecords(data);
-      setLoading(false);
+    if (authLoading) return;
+    if (!user) return;
+
+    const fetchUsers = async () => {
+      try {
+        const data = await getAllUsersClient();
+        setUsers(data);
+      } catch {
+        setError("Failed to fetch user list.");
+      }
     };
 
-    fetchRecords();
-  }, []);
+    fetchUsers();
+  }, [authLoading, user]);
 
-  return (
-    <Container
+  // ✅ Handle attendance fetch
+  const handleFetch = async () => {
+    if (!selectedUser) {
+      setError("Please select a user first.");
+      return;
+    }
+
+    setError(null);
+    setDataLoading(true);
+    try {
+      const data = await getAttendanceMonthlyClient(selectedUser, month, year);
+      setRecords(data);
+      if (data.length === 0) setError("No attendance records found for this user and month.");
+    } catch {
+      setError("Failed to fetch attendance records.");
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  // ✅ Loading phase
+  if (authLoading) {
+    return (
+      <Container
         maxWidth="xl"
         sx={{
-            width: "100%",      
-            maxWidth: "1600px", 
-            px: 3,              
+          width: "100%",
+          maxWidth: "1600px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
         }}
-    >
-        <Box sx={{ p: 4 }}>
+      >
+        <Typography variant="h5" color="text.secondary">
+          Checking admin access...
+        </Typography>
+      </Container>
+    );
+  }
+
+  return (
+    <Container maxWidth="xl" sx={{ width: "100%", maxWidth: "1600px", px: 3 }}>
+      <Box sx={{ p: 4 }}>
         <Typography variant="h4" mb={3} fontWeight="bold" color="primary">
-            Attendance Records
+          Attendance Records
         </Typography>
 
+        {/* Selection Controls */}
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 3 }}>
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>User</InputLabel>
+            <Select
+              value={selectedUser}
+              label="User"
+              onChange={(e) => setSelectedUser(Number(e.target.value))}
+            >
+              {users.map((u) => (
+                <MenuItem key={u.id} value={u.id}>
+                  {u.firstname} {u.lastname} ({u.email})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>Month</InputLabel>
+            <Select
+              value={month}
+              label="Month"
+              onChange={(e) => setMonth(Number(e.target.value))}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <MenuItem key={m} value={m}>
+                  {m}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>Year</InputLabel>
+            <Select
+              value={year}
+              label="Year"
+              onChange={(e) => setYear(Number(e.target.value))}
+            >
+              {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                <MenuItem key={y} value={y}>
+                  {y}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleFetch}
+            disabled={dataLoading}
+          >
+            {dataLoading ? "Loading..." : "Confirm"}
+          </Button>
+        </Box>
+
+        {/* Display Data */}
         {error && <Alert severity="warning">{error}</Alert>}
 
-        {!error && (
-            <TableContainer component={Paper}>
+        {!error && records.length > 0 && (
+          <TableContainer component={Paper}>
             <Table>
-                <TableHead>
+              <TableHead>
                 <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>Date & Time</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Latitude</TableCell>
-                    <TableCell>Longitude</TableCell>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Date & Time</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Latitude</TableCell>
+                  <TableCell>Longitude</TableCell>
                 </TableRow>
-                </TableHead>
+              </TableHead>
 
-                <TableBody>
+              <TableBody>
                 {records.map((record) => (
-                    <TableRow key={record.id}>
+                  <TableRow key={record.id}>
                     <TableCell>{record.id}</TableCell>
                     <TableCell>{new Date(record.date).toLocaleString()}</TableCell>
                     <TableCell
-                        style={{
+                      sx={{
                         color: record.status === "checkin" ? "green" : "red",
                         fontWeight: "bold",
-                        }}
+                      }}
                     >
-                        {record.status.toUpperCase()}
+                      {record.status.toUpperCase()}
                     </TableCell>
                     <TableCell>{record.latitude.toFixed(4)}</TableCell>
                     <TableCell>{record.longitude.toFixed(4)}</TableCell>
-                    </TableRow>
+                  </TableRow>
                 ))}
-                </TableBody>
+              </TableBody>
             </Table>
-            </TableContainer>
+          </TableContainer>
         )}
-
-        {loading && !error && <Typography mt={2}>Loading records...</Typography>}
-        </Box>
+      </Box>
     </Container>
   );
 }
