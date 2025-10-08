@@ -23,10 +23,10 @@ export default function AttendancePage() {
   const [checkedIn, setCheckedIn] = useState(false);
   const [checkedOut, setCheckedOut] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeButton, setActiveButton] = useState<"checkin" | "checkout" | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch today's status on mount
     fetchAttendanceStatus()
       .then((status) => {
         setCheckedIn(status.checkedIn);
@@ -47,6 +47,7 @@ export default function AttendancePage() {
     }
 
     setLoading(true);
+    setActiveButton(status);
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const { latitude, longitude } = pos.coords;
@@ -69,6 +70,7 @@ export default function AttendancePage() {
         setMessage("❌ 勤怠の記録に失敗しました。もう一度お試しください。");
       }
       setLoading(false);
+      setActiveButton(null);
       setOpenDialog(true);
     });
   };
@@ -118,6 +120,7 @@ export default function AttendancePage() {
         </Typography>
 
         <Stack direction="column" spacing={4} alignItems="center">
+          {/* 出勤ボタン */}
           <Button
             variant={checkedIn ? "outlined" : "contained"}
             color={checkedIn ? "inherit" : "success"}
@@ -126,9 +129,14 @@ export default function AttendancePage() {
             onClick={() => handleAttendance("checkin")}
             disabled={checkedIn || loading}
           >
-            {loading && !checkedIn ? <CircularProgress size={24} color="inherit" /> : "出勤"}
+            {loading && activeButton === "checkin" ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "出勤"
+            )}
           </Button>
 
+          {/* 退勤ボタン */}
           <Button
             variant={checkedOut ? "outlined" : "contained"}
             color={checkedOut ? "inherit" : "error"}
@@ -137,7 +145,11 @@ export default function AttendancePage() {
             onClick={() => handleAttendance("checkout")}
             disabled={checkedOut || loading}
           >
-            {loading && !checkedOut ? <CircularProgress size={24} color="inherit" /> : "退勤"}
+            {loading && activeButton === "checkout" ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "退勤"
+            )}
           </Button>
         </Stack>
 
