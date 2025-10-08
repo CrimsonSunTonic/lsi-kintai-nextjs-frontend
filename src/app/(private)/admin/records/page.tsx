@@ -49,6 +49,9 @@ export default function UserRecordsPage() {
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
   const [year, setYear] = useState<number>(new Date().getFullYear());
 
+  const token = localStorage.getItem("access_token");
+  console.log("token:", token);
+
   // ✅ Fetch user list (for admin)
   useEffect(() => {
     if (authLoading) return;
@@ -111,13 +114,13 @@ export default function UserRecordsPage() {
     <Container maxWidth="xl" sx={{ width: "100%", maxWidth: "1600px", px: 3 }}>
       <Box sx={{ p: 4 }}>
         <Typography variant="h4" mb={3} fontWeight="bold" color="primary">
-          Attendance Records
+          勤怠記録管理
         </Typography>
 
         {/* Selection Controls */}
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 3 }}>
           <FormControl sx={{ minWidth: 180 }}>
-            <InputLabel>User</InputLabel>
+            <InputLabel>社員選択</InputLabel>
             <Select
               value={selectedUser}
               label="User"
@@ -125,14 +128,14 @@ export default function UserRecordsPage() {
             >
               {users.map((u) => (
                 <MenuItem key={u.id} value={u.id}>
-                  {u.firstname} {u.lastname} ({u.email})
+                  {u.firstname} {u.lastname}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
           <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel>Month</InputLabel>
+            <InputLabel>月</InputLabel>
             <Select
               value={month}
               label="Month"
@@ -147,7 +150,7 @@ export default function UserRecordsPage() {
           </FormControl>
 
           <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel>Year</InputLabel>
+            <InputLabel>年</InputLabel>
             <Select
               value={year}
               label="Year"
