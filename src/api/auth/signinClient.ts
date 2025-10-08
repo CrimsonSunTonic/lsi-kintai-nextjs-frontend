@@ -9,7 +9,6 @@ export interface UserData {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export async function login(email: string, password: string): Promise<string> {
-  console.log("check >>>> API_BASE:", API_BASE);
   const res = await fetch(`${API_BASE}/auth/signin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -59,6 +59,8 @@ export default function AttendancePage() {
           minute: "2-digit",
           second: "2-digit",
         });
+        console.log("Attendance recorded:", res);
+        console.log("Recorded time:", timeOnly);
         setRecord(res);
         setMessage(
           `✅ ${status === "checkin" ? "出勤" : "退勤"} が記録されました。\n記録時刻: ${timeOnly}`,
