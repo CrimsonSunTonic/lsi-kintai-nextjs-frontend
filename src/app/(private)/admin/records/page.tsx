@@ -22,6 +22,7 @@ import {
 import { getAttendanceMonthlyClient } from "@/api/attendance/getAttendanceMonthlyClient";
 import { getAllUsersClient } from "@/api/user/getAllUsersClient";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import * as XLSX from "xlsx";
 
 interface AttendanceRecord {
   id: number;
@@ -43,6 +44,69 @@ interface GroupedRecord {
   weekday: string;
   checkin?: string;
   checkout?: string;
+}
+
+// Add this utility function for time calculation
+function parseTime(str: string) {
+  // "HH:MM" or "H:MM"
+  const [h, m] = str.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function roundToHalfHour(minutes: number) {
+  return Math.floor(minutes / 30) * 0.5;
+}
+
+function calcWorkTimes(checkin: string, checkout: string, weekday: string) {
+  if (!checkin || !checkout) return { actual: "", normalOt: "", midnightOt: "" };
+
+  let start = parseTime(checkin);
+  let end = parseTime(checkout);
+  if (end < start) end += 24 * 60; // handle overnight
+
+  // Subtract break times
+  const breaks = [
+    [8 * 60, 9 * 60],
+    [12 * 60, 13 * 60],
+    [19 * 60, 20 * 60],
+    [2 * 60, 3 * 60],
+  ];
+  let workMinutes = end - start;
+  breaks.forEach(([bStart, bEnd]) => {
+    // If break overlaps with work time
+    const overlap = Math.max(0, Math.min(end, bEnd) - Math.max(start, bStart));
+    workMinutes -= overlap;
+  });
+
+  // 実働時間
+  const actual = roundToHalfHour(workMinutes);
+
+  // 普通残業
+  let normalOt = "";
+  if (!["土", "日"].includes(weekday) && actual >= 9) {
+    const roundedNormalOt = roundToHalfHour((actual - 8) * 60);
+    normalOt = roundedNormalOt < 1 ? "" : String(roundedNormalOt);
+  }
+
+  // 深夜残業 (22:30-4:00)
+  let midnightOtMinutes = 0;
+  const midnightRanges = [
+    [22 * 60 + 30, 24 * 60],
+    [0, 4 * 60],
+  ];
+  midnightRanges.forEach(([mStart, mEnd]) => {
+    const overlap = Math.max(0, Math.min(end, mEnd) - Math.max(start, mStart));
+    // Subtract breaks in midnight range
+    breaks.forEach(([bStart, bEnd]) => {
+      if (bEnd <= mStart || bStart >= mEnd) return;
+      const bOverlap = Math.max(0, Math.min(mEnd, bEnd) - Math.max(mStart, bStart));
+      midnightOtMinutes -= bOverlap;
+    });
+    midnightOtMinutes += overlap;
+  });
+  const midnightOt = midnightOtMinutes > 0 ? roundToHalfHour(midnightOtMinutes) : "";
+
+  return { actual, normalOt, midnightOt };
 }
 
 export default function UserRecordsPage() {
@@ -141,6 +205,38 @@ export default function UserRecordsPage() {
     }
   };
 
+  // Export handlers
+  const handleExportExcel = () => {
+    const tableName = `${selectedUserName} ${year}年${month}月の勤務表`;
+    const wsData = [
+      [
+        "日付",
+        "曜日",
+        "出勤時刻",
+        "退勤時刻",
+        "実働時間",
+        "普通残業",
+        "深夜残業",
+      ],
+      ...records.map((rec) => {
+        const { actual, normalOt, midnightOt } = calcWorkTimes(rec.checkin || "", rec.checkout || "", rec.weekday);
+        return [
+          rec.day,
+          rec.weekday,
+          rec.checkin || "-",
+          rec.checkout || "-",
+          actual || "",
+          normalOt || "",
+          midnightOt || "",
+        ];
+      }),
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, `${tableName}.xlsx`);
+  };
+
   if (authLoading) {
     return (
       <Container
@@ -174,62 +270,74 @@ export default function UserRecordsPage() {
         </Typography>
 
         {/* Controls */}
-        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 3 }}>
-          <FormControl sx={{ minWidth: 180 }}>
-            <InputLabel>社員選択</InputLabel>
-            <Select
-              value={selectedUser}
-              label="User"
-              onChange={(e) => setSelectedUser(Number(e.target.value))}
-            >
-              {users.map((u) => (
-                <MenuItem key={u.id} value={u.id}>
-                  {u.firstname} {u.lastname}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel>月</InputLabel>
-            <Select
-              value={month}
-              label="Month"
-              onChange={(e) => setMonth(Number(e.target.value))}
-            >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                <MenuItem key={m} value={m}>
-                  {m}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel>年</InputLabel>
-            <Select
-              value={year}
-              label="Year"
-              onChange={(e) => setYear(Number(e.target.value))}
-            >
-              {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(
-                (y) => (
-                  <MenuItem key={y} value={y}>
-                    {y}
+        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", flex: 1 }}>
+            <FormControl sx={{ minWidth: 180 }}>
+              <InputLabel>社員選択</InputLabel>
+              <Select
+                value={selectedUser}
+                label="User"
+                onChange={(e) => setSelectedUser(Number(e.target.value))}
+              >
+                {users.map((u) => (
+                  <MenuItem key={u.id} value={u.id}>
+                    {u.firstname} {u.lastname}
                   </MenuItem>
-                )
-              )}
-            </Select>
-          </FormControl>
+                ))}
+              </Select>
+            </FormControl>
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFetch}
-            disabled={dataLoading}
-          >
-            {dataLoading ? "Loading..." : "Confirm"}
-          </Button>
+            <FormControl sx={{ minWidth: 120 }}>
+              <InputLabel>月</InputLabel>
+              <Select
+                value={month}
+                label="Month"
+                onChange={(e) => setMonth(Number(e.target.value))}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <MenuItem key={m} value={m}>
+                    {m}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 120 }}>
+              <InputLabel>年</InputLabel>
+              <Select
+                value={year}
+                label="Year"
+                onChange={(e) => setYear(Number(e.target.value))}
+              >
+                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(
+                  (y) => (
+                    <MenuItem key={y} value={y}>
+                      {y}
+                    </MenuItem>
+                  )
+                )}
+              </Select>
+            </FormControl>
+
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleFetch}
+              disabled={dataLoading}
+            >
+              {dataLoading ? "Loading..." : "Confirm"}
+            </Button>
+          </Box>
+          <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={handleExportExcel}
+              disabled={records.length === 0}
+            >
+              印刷(エクセル)
+            </Button>
+          </Box>
         </Box>
 
         {error && <Alert severity="warning">{error}</Alert>}
@@ -255,42 +363,38 @@ export default function UserRecordsPage() {
                   <TableRow>
                     <TableCell sx={{ fontWeight: "bold" }}>日付</TableCell>
                     <TableCell sx={{ fontWeight: "bold" }}>曜日</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>出勤</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>退勤</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>出勤時刻</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>退勤時刻</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>実働時間</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>普通残業</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>深夜残業</TableCell>
                   </TableRow>
                 </TableHead>
-                  <TableBody>
-                    {records.map((rec) => {
-                      let bgColor = "inherit";
-                      let textColor = "inherit";
-
-                      if (rec.weekday === "土") {
-                        bgColor = "#e3f2fd"; // light blue for Saturday
-                        textColor = "#0d47a1"; // deep blue text
-                      } else if (rec.weekday === "日") {
-                        bgColor = "#ffebee"; // light red for Sunday
-                        textColor = "#b71c1c"; // deep red text
-                      }
-
-                      return (
-                        <TableRow key={rec.day} sx={{ backgroundColor: bgColor }}>
-                          <TableCell sx={{ color: textColor, fontWeight: "bold" }}>
-                            {rec.day}
-                          </TableCell>
-                          <TableCell sx={{ color: textColor, fontWeight: "bold" }}>
-                            {rec.weekday}
-                          </TableCell>
-                          <TableCell sx={{ color: "green", fontWeight: "bold" }}>
-                            {rec.checkin || "-"}
-                          </TableCell>
-                          <TableCell sx={{ color: "red", fontWeight: "bold" }}>
-                            {rec.checkout || "-"}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-
+                <TableBody>
+                  {records.map((rec) => {
+                    let bgColor = "inherit";
+                    let textColor = "inherit";
+                    if (rec.weekday === "土") {
+                      bgColor = "#e3f2fd";
+                      textColor = "#0d47a1";
+                    } else if (rec.weekday === "日") {
+                      bgColor = "#ffebee";
+                      textColor = "#b71c1c";
+                    }
+                    const { actual, normalOt, midnightOt } = calcWorkTimes(rec.checkin || "", rec.checkout || "", rec.weekday);
+                    return (
+                      <TableRow key={rec.day} sx={{ backgroundColor: bgColor }}>
+                        <TableCell sx={{ color: textColor, fontWeight: "bold" }}>{rec.day}</TableCell>
+                        <TableCell sx={{ color: textColor, fontWeight: "bold" }}>{rec.weekday}</TableCell>
+                        <TableCell sx={{ color: "green", fontWeight: "bold" }}>{rec.checkin || "-"}</TableCell>
+                        <TableCell sx={{ color: "red", fontWeight: "bold" }}>{rec.checkout || "-"}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>{actual || ""}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>{normalOt || ""}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>{midnightOt || ""}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
               </Table>
             </TableContainer>
           </>
