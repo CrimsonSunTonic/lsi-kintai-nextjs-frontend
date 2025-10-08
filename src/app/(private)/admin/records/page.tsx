@@ -38,9 +38,16 @@ interface User {
   email: string;
 }
 
+interface GroupedRecord {
+  day: number; // only day number
+  weekday: string;
+  checkin?: string;
+  checkout?: string;
+}
+
 export default function UserRecordsPage() {
-  const { user, loading: authLoading } = useAdminAuth(); // ✅ check admin
-  const [records, setRecords] = useState<AttendanceRecord[]>([]);
+  const { user, loading: authLoading } = useAdminAuth();
+  const [records, setRecords] = useState<GroupedRecord[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,14 +56,9 @@ export default function UserRecordsPage() {
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
   const [year, setYear] = useState<number>(new Date().getFullYear());
 
-  const token = localStorage.getItem("access_token");
-  console.log("token:", token);
-
-  // ✅ Fetch user list (for admin)
+  // ✅ Fetch all users
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) return;
-
+    if (authLoading || !user) return;
     const fetchUsers = async () => {
       try {
         const data = await getAllUsersClient();
@@ -65,11 +67,24 @@ export default function UserRecordsPage() {
         setError("Failed to fetch user list.");
       }
     };
-
     fetchUsers();
   }, [authLoading, user]);
 
-  // ✅ Handle attendance fetch
+  // ✅ Generate all days in the month
+  const generateAllDays = (year: number, month: number): GroupedRecord[] => {
+    const days: GroupedRecord[] = [];
+    const date = new Date(year, month - 1, 1);
+    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+
+    while (date.getMonth() + 1 === month) {
+      const weekday = weekdays[date.getDay()];
+      days.push({ day: date.getDate(), weekday });
+      date.setDate(date.getDate() + 1);
+    }
+    return days;
+  };
+
+  // ✅ Fetch and merge attendance
   const handleFetch = async () => {
     if (!selectedUser) {
       setError("Please select a user first.");
@@ -78,10 +93,47 @@ export default function UserRecordsPage() {
 
     setError(null);
     setDataLoading(true);
+
     try {
-      const data = await getAttendanceMonthlyClient(selectedUser, month, year);
-      setRecords(data);
-      if (data.length === 0) setError("No attendance records found for this user and month.");
+      const data: AttendanceRecord[] = await getAttendanceMonthlyClient(
+        selectedUser,
+        month,
+        year
+      );
+
+      // Group attendance by date string (YYYY-MM-DD)
+      const grouped: Record<string, { checkin?: string; checkout?: string }> = {};
+
+      data.forEach((rec) => {
+        const dateObj = new Date(rec.date);
+        const dateKey = dateObj.toISOString().split("T")[0];
+        const time = dateObj.toLocaleTimeString("ja-JP", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        if (!grouped[dateKey]) grouped[dateKey] = {};
+
+        if (rec.status === "checkin" && !grouped[dateKey].checkin)
+          grouped[dateKey].checkin = time;
+        if (rec.status === "checkout")
+          grouped[dateKey].checkout = time;
+      });
+
+      // Merge with all days of month
+      const allDays = generateAllDays(year, month);
+      const fullRecords = allDays.map((d) => {
+        const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(d.day).padStart(2, "0")}`;
+        const dayData = grouped[dateKey] || {};
+        return {
+          day: d.day,
+          weekday: d.weekday,
+          checkin: dayData.checkin || "",
+          checkout: dayData.checkout || "",
+        };
+      });
+
+      setRecords(fullRecords);
     } catch {
       setError("Failed to fetch attendance records.");
     } finally {
@@ -89,7 +141,6 @@ export default function UserRecordsPage() {
     }
   };
 
-  // ✅ Loading phase
   if (authLoading) {
     return (
       <Container
@@ -110,6 +161,11 @@ export default function UserRecordsPage() {
     );
   }
 
+  const selectedUserName =
+    users.find((u) => u.id === selectedUser)?.firstname +
+      " " +
+      users.find((u) => u.id === selectedUser)?.lastname || "";
+
   return (
     <Container maxWidth="xl" sx={{ width: "100%", maxWidth: "1600px", px: 3 }}>
       <Box sx={{ p: 4 }}>
@@ -117,7 +173,7 @@ export default function UserRecordsPage() {
           勤怠記録管理
         </Typography>
 
-        {/* Selection Controls */}
+        {/* Controls */}
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 3 }}>
           <FormControl sx={{ minWidth: 180 }}>
             <InputLabel>社員選択</InputLabel>
@@ -156,11 +212,13 @@ export default function UserRecordsPage() {
               label="Year"
               onChange={(e) => setYear(Number(e.target.value))}
             >
-              {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((y) => (
-                <MenuItem key={y} value={y}>
-                  {y}
-                </MenuItem>
-              ))}
+              {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(
+                (y) => (
+                  <MenuItem key={y} value={y}>
+                    {y}
+                  </MenuItem>
+                )
+              )}
             </Select>
           </FormControl>
 
@@ -174,42 +232,68 @@ export default function UserRecordsPage() {
           </Button>
         </Box>
 
-        {/* Display Data */}
         {error && <Alert severity="warning">{error}</Alert>}
 
         {!error && records.length > 0 && (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Date & Time</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Latitude</TableCell>
-                  <TableCell>Longitude</TableCell>
-                </TableRow>
-              </TableHead>
+          <>
+            {/* ✅ Table title */}
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: "bold",
+                mb: 2,
+                textAlign: "center",
+                color: "#333",
+              }}
+            >
+              {selectedUserName}　{year}年{month}月の勤務表
+            </Typography>
 
-              <TableBody>
-                {records.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell>{record.id}</TableCell>
-                    <TableCell>{new Date(record.date).toLocaleString()}</TableCell>
-                    <TableCell
-                      sx={{
-                        color: record.status === "checkin" ? "green" : "red",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {record.status.toUpperCase()}
-                    </TableCell>
-                    <TableCell>{record.latitude.toFixed(4)}</TableCell>
-                    <TableCell>{record.longitude.toFixed(4)}</TableCell>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: "bold" }}>日付</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>曜日</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>出勤</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>退勤</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                  <TableBody>
+                    {records.map((rec) => {
+                      let bgColor = "inherit";
+                      let textColor = "inherit";
+
+                      if (rec.weekday === "土") {
+                        bgColor = "#e3f2fd"; // light blue for Saturday
+                        textColor = "#0d47a1"; // deep blue text
+                      } else if (rec.weekday === "日") {
+                        bgColor = "#ffebee"; // light red for Sunday
+                        textColor = "#b71c1c"; // deep red text
+                      }
+
+                      return (
+                        <TableRow key={rec.day} sx={{ backgroundColor: bgColor }}>
+                          <TableCell sx={{ color: textColor, fontWeight: "bold" }}>
+                            {rec.day}
+                          </TableCell>
+                          <TableCell sx={{ color: textColor, fontWeight: "bold" }}>
+                            {rec.weekday}
+                          </TableCell>
+                          <TableCell sx={{ color: "green", fontWeight: "bold" }}>
+                            {rec.checkin || "-"}
+                          </TableCell>
+                          <TableCell sx={{ color: "red", fontWeight: "bold" }}>
+                            {rec.checkout || "-"}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+
+              </Table>
+            </TableContainer>
+          </>
         )}
       </Box>
     </Container>
