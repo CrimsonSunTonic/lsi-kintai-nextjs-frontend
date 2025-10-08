@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { sendAttendance, Attendance } from "@/api/attendance/attendanceClient";
 import { fetchAttendanceStatus } from "@/api/attendance/fetchAttendanceStatusClient";
+import { log } from "console";
 
 export default function AttendancePage() {
   const [message, setMessage] = useState<string | null>(null);
@@ -54,16 +55,14 @@ export default function AttendancePage() {
 
       const res = await sendAttendance(status, latitude, longitude);
       if (res) {
-        const dateObj = new Date(res.date);
-        const hours = String(dateObj.getHours()).padStart(2, "0");
-        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-
-        const timeOnly = `${hours}:${minutes}`;
+        // Extract HH:MM directly from ISO string
+        const timeOnly = res.date.split("T")[1].slice(0, 5);
 
         setRecord(res);
         setMessage(
           `✅ ${status === "checkin" ? "出勤" : "退勤"} が記録されました。\n記録時刻: ${timeOnly}`,
         );
+
         if (status === "checkin") setCheckedIn(true);
         if (status === "checkout") setCheckedOut(true);
       } else {

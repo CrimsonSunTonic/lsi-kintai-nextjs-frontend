@@ -169,13 +169,8 @@ export default function UserRecordsPage() {
       const grouped: Record<string, { checkin?: string; checkout?: string }> = {};
 
       data.forEach((rec) => {
-        const dateObj = new Date(rec.date);
-        const dateKey = dateObj.toISOString().split("T")[0];
-
-        // Format time as HH:MM
-        const hours = String(dateObj.getHours()).padStart(2, "0");
-        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-        const time = `${hours}:${minutes}`;
+        const dateKey = rec.date.split("T")[0];       // YYYY-MM-DD
+        const time = rec.date.split("T")[1].slice(0, 5); // HH:MM
 
         if (!grouped[dateKey]) grouped[dateKey] = {};
 
@@ -187,7 +182,7 @@ export default function UserRecordsPage() {
 
       // Merge with all days of month
       const allDays = generateAllDays(year, month);
-      const fullRecords = allDays.map((d) => {
+      const fullRecords = allDays.map((d: { day: any; weekday: any; }) => {
         const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(d.day).padStart(2, "0")}`;
         const dayData = grouped[dateKey] || {};
         return {
