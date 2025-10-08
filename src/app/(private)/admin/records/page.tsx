@@ -128,7 +128,7 @@ export default function UserRecordsPage() {
         const data = await getAllUsersClient();
         setUsers(data);
       } catch {
-        setError("Failed to fetch user list.");
+        setError("社員の取得に失敗しました。");
       }
     };
     fetchUsers();
