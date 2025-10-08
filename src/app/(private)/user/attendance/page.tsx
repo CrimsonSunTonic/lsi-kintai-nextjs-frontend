@@ -54,13 +54,12 @@ export default function AttendancePage() {
 
       const res = await sendAttendance(status, latitude, longitude);
       if (res) {
-        const timeOnly = new Date(res.date).toLocaleTimeString("ja-JP", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        });
-        console.log("Attendance recorded:", res);
-        console.log("Recorded time:", timeOnly);
+        const dateObj = new Date(res.date);
+        const hours = String(dateObj.getHours()).padStart(2, "0");
+        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+        const timeOnly = `${hours}:${minutes}`;
+
         setRecord(res);
         setMessage(
           `✅ ${status === "checkin" ? "出勤" : "退勤"} が記録されました。\n記録時刻: ${timeOnly}`,

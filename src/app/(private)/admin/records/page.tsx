@@ -171,10 +171,11 @@ export default function UserRecordsPage() {
       data.forEach((rec) => {
         const dateObj = new Date(rec.date);
         const dateKey = dateObj.toISOString().split("T")[0];
-        const time = dateObj.toLocaleTimeString("ja-JP", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+
+        // Format time as HH:MM
+        const hours = String(dateObj.getHours()).padStart(2, "0");
+        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+        const time = `${hours}:${minutes}`;
 
         if (!grouped[dateKey]) grouped[dateKey] = {};
 
