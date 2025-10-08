@@ -21,7 +21,7 @@ export async function login(email: string, password: string): Promise<string> {
     throw new Error(
       Array.isArray(data.message)
         ? data.message.join(", ")
-        : data.message || "Login failed"
+        : data.message || "ログインに失敗しました"
     );
   }
 

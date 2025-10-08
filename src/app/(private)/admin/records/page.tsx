@@ -151,7 +151,7 @@ export default function UserRecordsPage() {
   // ✅ Fetch and merge attendance
   const handleFetch = async () => {
     if (!selectedUser) {
-      setError("Please select a user first.");
+      setError("社員を選択してください。");
       return;
     }
 
@@ -247,7 +247,7 @@ export default function UserRecordsPage() {
         }}
       >
         <Typography variant="h5" color="text.secondary">
-          Checking admin access...
+          管理者アクセスを確認中…
         </Typography>
       </Container>
     );
@@ -321,7 +321,7 @@ export default function UserRecordsPage() {
               onClick={handleFetch}
               disabled={dataLoading}
             >
-              {dataLoading ? "Loading..." : "Confirm"}
+              {dataLoading ? "読み込み中..." : "確認"}
             </Button>
           </Box>
           <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>

@@ -20,11 +20,11 @@ export async function getAttendanceClient(): Promise<AttendanceRecord[]> {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!res.ok) throw new Error("Failed to fetch attendance records");
+    if (!res.ok) throw new Error("勤怠記録の取得に失敗しました");
 
     return await res.json();
   } catch (err) {
-    console.error("Error fetching attendance records:", err);
+    console.error("勤怠記録の取得中にエラーが発生しました:", err);
     return [];
   }
 }

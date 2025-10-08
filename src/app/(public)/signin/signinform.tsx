@@ -106,7 +106,7 @@ const SigninForm = () => {
             mb: 2,
           }}
         >
-          Sign In
+          ログイン
         </Typography>
 
         {error && (
@@ -123,25 +123,31 @@ const SigninForm = () => {
         >
           {/* Email */}
           <FormControl>
-            <FormLabel htmlFor="email">Email</FormLabel>
+            <FormLabel htmlFor="email">メールアドレス</FormLabel>
             <TextField
               id="email"
               type="email"
               name="email"
-              placeholder="your@email.com"
+              placeholder="tarou@email.com"
               autoComplete="email"
               required
               fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={!!emailError}
-              helperText={emailError}
+              helperText={
+                emailError === "Email should not be empty"
+                  ? "メールアドレスを入力してください"
+                  : emailError === "Email must be a valid email address"
+                  ? "有効なメールアドレスを入力してください"
+                  : emailError
+              }
             />
           </FormControl>
 
           {/* Password */}
           <FormControl>
-            <FormLabel htmlFor="password">Password</FormLabel>
+            <FormLabel htmlFor="password">パスワード</FormLabel>
             <TextField
               name="password"
               placeholder="••••••"
@@ -153,7 +159,13 @@ const SigninForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               error={!!passwordError}
-              helperText={passwordError}
+              helperText={
+                passwordError === "Password should not be empty"
+                  ? "パスワードを入力してください"
+                  : passwordError === "Password must be at least 8 characters long"
+                  ? "パスワードは8文字以上で入力してください"
+                  : passwordError
+              }
             />
           </FormControl>
 
@@ -164,17 +176,17 @@ const SigninForm = () => {
             disabled={loading}
             sx={{ py: 1.2, fontSize: "1rem", fontWeight: 600 }}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "ログイン中..." : "ログイン"}
           </Button>
         </Box>
 
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <Typography>
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" variant="body2">
-              Sign up
-            </Link>
+            アカウントをお持ちでない方はこちら{" "}
           </Typography>
+          <Link href="/signup" variant="body2">
+            新規登録
+          </Link>
         </Box>
       </Card>
     </Container>

@@ -21,6 +21,6 @@ export async function getAttendanceMonthlyClient(
     body: formData.toString(),
   });
 
-  if (!res.ok) throw new Error("Failed to fetch attendance");
+  if (!res.ok) throw new Error("勤怠情報の取得に失敗しました");
   return res.json();
 }

@@ -2,7 +2,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export async function fetchAttendanceStatus(): Promise<{ checkedIn: boolean; checkedOut: boolean }> {
   const token = localStorage.getItem("access_token");
-  if (!token) throw new Error("No access token found");
+  if (!token) throw new Error("アクセストークンが見つかりません");
 
   try {
     const res = await fetch(`${API_BASE}/attendance/status`, {
@@ -12,12 +12,12 @@ export async function fetchAttendanceStatus(): Promise<{ checkedIn: boolean; che
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch status: ${res.statusText}`);
+      throw new Error(`ステータスの取得に失敗しました: ${res.statusText}`);
     }
 
     return await res.json();
   } catch (err) {
-    console.error("Error fetching attendance status:", err);
+    console.error("勤怠ステータスの取得中にエラーが発生しました:", err);
     throw err;
   }
 }

@@ -26,7 +26,7 @@ export async function signup(
     throw new Error(
       Array.isArray(data.message)
         ? data.message.join(", ")
-        : data.message || "Signup failed"
+        : data.message || "新規登録に失敗しました"
     );
   }
 

@@ -130,7 +130,7 @@ const AppHeader = ({ user }: { user: UserData }) => {
               }}
               onClick={handleLogout}
             >
-              Logout
+              ログアウト
             </Button>
           </Box>
 

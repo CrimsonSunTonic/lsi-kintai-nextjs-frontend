@@ -154,7 +154,7 @@ const SignupForm = () => {
             fontWeight: "bold",
           }}
         >
-          Sign Up
+          新規登録
         </Typography>
 
         {error && (
@@ -174,22 +174,28 @@ const SignupForm = () => {
           }}
         >
           <FormControl>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>メールアドレス</FormLabel>
             <TextField
               type="email"
-              placeholder="your@email.com"
+              placeholder="tarou@email.com"
               autoComplete="email"
               fullWidth
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={!!emailError}
-              helperText={emailError}
+              helperText={emailError && (
+                emailError === "Email should not be empty"
+                  ? "メールアドレスを入力してください"
+                  : emailError === "Email must be a valid email address"
+                  ? "有効なメールアドレスを入力してください"
+                  : emailError
+              )}
             />
           </FormControl>
 
           <FormControl>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>パスワード</FormLabel>
             <TextField
               type="password"
               placeholder="••••••••"
@@ -199,60 +205,80 @@ const SignupForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               error={!!passwordError}
-              helperText={passwordError}
+              helperText={passwordError && (
+                passwordError === "Password should not be empty"
+                  ? "パスワードを入力してください"
+                  : passwordError === "Password must be at least 8 characters long"
+                  ? "パスワードは8文字以上で入力してください"
+                  : passwordError
+              )}
             />
           </FormControl>
 
           <FormControl>
-            <FormLabel>Repeat Password</FormLabel>
+            <FormLabel>パスワード（確認）</FormLabel>
             <TextField
               type="password"
-              placeholder="Re-enter your password"
+              placeholder="もう一度パスワードを入力してください"
               fullWidth
               required
               value={repeatPassword}
               onChange={(e) => handleRepeatPasswordChange(e.target.value)}
               error={!!repeatPasswordError}
-              helperText={repeatPasswordError}
+              helperText={repeatPasswordError && (
+                repeatPasswordError === "Please confirm your password"
+                  ? "パスワードを再入力してください"
+                  : repeatPasswordError === "Passwords do not match"
+                  ? "パスワードが一致しません"
+                  : repeatPasswordError
+              )}
             />
           </FormControl>
 
           <FormControl>
-            <FormLabel>First Name</FormLabel>
+            <FormLabel>名</FormLabel>
             <TextField
-              placeholder="Enter your first name"
+              placeholder="名を入力してください"
               fullWidth
               required
               value={firstname}
               onChange={(e) => setFirstname(e.target.value)}
               error={!!firstnameError}
-              helperText={firstnameError}
+              helperText={firstnameError && (
+                firstnameError === "First name should not be empty"
+                  ? "名を入力してください"
+                  : firstnameError
+              )}
             />
           </FormControl>
 
           <FormControl>
-            <FormLabel>Last Name</FormLabel>
+            <FormLabel>姓</FormLabel>
             <TextField
-              placeholder="Enter your last name"
+              placeholder="姓を入力してください"
               fullWidth
               required
               value={lastname}
               onChange={(e) => setLastname(e.target.value)}
               error={!!lastnameError}
-              helperText={lastnameError}
+              helperText={lastnameError && (
+                lastnameError === "Last name should not be empty"
+                  ? "姓を入力してください"
+                  : lastnameError
+              )}
             />
           </FormControl>
 
           <Button type="submit" fullWidth variant="contained" disabled={loading}>
-            {loading ? "Signing up..." : "Sign Up"}
+            {loading ? "登録中..." : "新規登録"}
           </Button>
         </Box>
 
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <Typography variant="body2">
-            Already have an account?{" "}
+            すでにアカウントをお持ちですか？{" "}
             <Link href="/signin" underline="hover">
-              Log in
+              ログイン
             </Link>
           </Typography>
         </Box>
@@ -261,7 +287,7 @@ const SignupForm = () => {
       {/* ✅ Success Dialog */}
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>
-          🎉 Signup Successful!
+          🎉 登録が完了しました！
         </DialogTitle>
         <DialogContent
           dividers
@@ -271,7 +297,7 @@ const SignupForm = () => {
             color: "text.secondary",
           }}
         >
-          Your account has been created successfully.
+          アカウントが正常に作成されました。
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
           <Button
@@ -280,7 +306,7 @@ const SignupForm = () => {
             onClick={handleDialogClose}
             sx={{ px: 4 }}
           >
-            Go to Sign In
+            ログイン画面へ
           </Button>
         </DialogActions>
       </Dialog>

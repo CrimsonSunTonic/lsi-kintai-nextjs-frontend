@@ -9,6 +9,6 @@ export async function getAllUsersClient() {
     },
   });
 
-  if (!res.ok) throw new Error("Failed to fetch users");
+  if (!res.ok) throw new Error("ユーザーの取得に失敗しました");
   return res.json();
 }

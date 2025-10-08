@@ -17,10 +17,13 @@ export async function getUserClient(): Promise<UserData | null> {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("ユーザー情報の取得に失敗しました");
+      return null;
+    }
     return await res.json();
   } catch (err) {
-    console.error("Failed to fetch user:", err);
+    console.error("ユーザー情報の取得に失敗しました:", err);
     return null;
   }
 }
