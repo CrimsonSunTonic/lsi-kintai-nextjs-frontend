@@ -50,7 +50,9 @@ export default function HomePage() {
       }}
     >
       <CircularProgress />
-      <Typography variant="h6">Checking authentication...</Typography>
+      <Typography variant="h6" color="primary">
+        認証確認中...
+      </Typography>
     </Box>
   );
 }
