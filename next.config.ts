@@ -1,4 +1,5 @@
 import os from 'os';
+import { config } from 'process';
 
 function getLocalIPs(): string[] {
   const interfaces = os.networkInterfaces();
@@ -23,6 +24,7 @@ const nextConfig = {
   allowedDevOrigins: [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    process.env.IP_HOST_URL,
     ...getLocalIPs(),
   ],
 };
