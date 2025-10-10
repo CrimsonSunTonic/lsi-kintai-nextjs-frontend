@@ -1,19 +1,32 @@
-import type { NextConfig } from "next";
+import os from 'os';
 
-const nextConfig: NextConfig = {
-  /* config options here */
+function getLocalIPs(): string[] {
+  const interfaces = os.networkInterfaces();
+  const ips: string[] = [];
+
+  for (const name of Object.keys(interfaces)) {
+    const nets = interfaces[name];
+    if (!nets) continue; // ✅ skip undefined interfaces
+
+    for (const net of nets) {
+      if (net.family === 'IPv4' && !net.internal) {
+        ips.push(`http://${net.address}:3000`);
+      }
+    }
+  }
+
+  return ips;
+}
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   allowedDevOrigins: [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'http://0.0.0.0:3000',
-    // You can include your LAN subnet if needed
-    'http://192.168.1.0:3000',
-    'http://192.168.1.1:3000',
-    'http://192.168.1.2:3000',
-    'http://192.168.1.3:3000',
-    'http://192.168.1.4:3000',
-    'http://192.168.1.5:3000',
+    ...getLocalIPs(),
   ],
 };
+
+console.log('✅ Allowed dev origins:', nextConfig.allowedDevOrigins);
 
 export default nextConfig;
