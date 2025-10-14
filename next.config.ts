@@ -1,5 +1,4 @@
 import os from 'os';
-import { config } from 'process';
 
 function getLocalIPs(): string[] {
   const interfaces = os.networkInterfaces();
@@ -22,12 +21,15 @@ function getLocalIPs(): string[] {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   allowedDevOrigins: [
+    'http://localhost',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     process.env.IP_HOST_URL,
     ...getLocalIPs(),
   ],
 };
+
+console.log('✅ NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
 
 console.log('✅ Allowed dev origins:', nextConfig.allowedDevOrigins);
 
