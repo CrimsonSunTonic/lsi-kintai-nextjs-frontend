@@ -13,9 +13,9 @@ import {
   DialogActions,
   CircularProgress,
 } from "@mui/material";
-import { sendAttendance, Attendance } from "@/api/attendance/attendanceClient";
+import { Attendance } from "@/api/attendance/attendanceClient";
 import { fetchAttendanceStatus } from "@/api/attendance/fetchAttendanceStatusClient";
-import { log } from "console";
+import { handleAttendanceAction } from "@/utils/attendanceHandler";
 
 export default function AttendancePage() {
   const [message, setMessage] = useState<string | null>(null);
@@ -41,38 +41,22 @@ export default function AttendancePage() {
   }, []);
 
   const handleAttendance = async (status: "checkin" | "checkout") => {
-    if (!navigator.geolocation) {
-      setMessage("お使いのブラウザは位置情報をサポートしていません。");
-      setOpenDialog(true);
-      return;
-    }
-
     setLoading(true);
     setActiveButton(status);
 
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const { latitude, longitude } = pos.coords;
+    const result = await handleAttendanceAction(status);
 
-      const res = await sendAttendance(status, latitude, longitude);
-      if (res) {
-        // Extract HH:MM directly from ISO string
-        const timeOnly = res.date.split("T")[1].slice(0, 5);
+    setRecord(result.record);
+    setMessage(result.message);
+    setOpenDialog(true);
 
-        setRecord(res);
-        setMessage(
-          `✅ ${status === "checkin" ? "出勤" : "退勤"} が記録されました。\n記録時刻: ${timeOnly}`,
-        );
+    if (result.success) {
+      if (status === "checkin") setCheckedIn(true);
+      if (status === "checkout") setCheckedOut(true);
+    }
 
-        if (status === "checkin") setCheckedIn(true);
-        if (status === "checkout") setCheckedOut(true);
-      } else {
-        setRecord(null);
-        setMessage("❌ 勤怠の記録に失敗しました。もう一度お試しください。");
-      }
-      setLoading(false);
-      setActiveButton(null);
-      setOpenDialog(true);
-    });
+    setLoading(false);
+    setActiveButton(null);
   };
 
   const handleCloseDialog = () => {
