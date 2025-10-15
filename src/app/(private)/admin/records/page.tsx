@@ -17,7 +17,7 @@ import { getAllUsersClient } from "@/api/user/getAllUsersClient";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import AttendanceTable from "./components/AttendanceTable";
 import MapDialog from "./components/MapDialog";
-import * as XLSX from "xlsx";
+import { exportAttendanceExcel } from "./utils/exportAttendanceExcel";
 
 interface AttendanceRecord {
   id: number;
@@ -41,66 +41,6 @@ interface GroupedRecord {
   checkout?: string;
   checkinLoc?: [number, number];
   checkoutLoc?: [number, number];
-}
-
-// ===== Utility functions =====
-function parseTime(str: string) {
-  const [h, m] = str.split(":").map(Number);
-  return h * 60 + m;
-}
-
-function roundToHalfHour(minutes: number) {
-  return Math.floor(minutes / 30) * 0.5;
-}
-
-function calcWorkTimes(checkin: string, checkout: string, weekday: string) {
-  if (!checkin || !checkout) return { actual: "", normalOt: "", midnightOt: "" };
-
-  let start = parseTime(checkin);
-  let end = parseTime(checkout);
-  if (end < start) end += 24 * 60;
-
-  // Break times
-  const breaks = [
-    [8 * 60, 9 * 60],
-    [12 * 60, 13 * 60],
-    [19 * 60, 20 * 60],
-    [2 * 60, 3 * 60],
-  ];
-  let workMinutes = end - start;
-  breaks.forEach(([bStart, bEnd]) => {
-    const overlap = Math.max(0, Math.min(end, bEnd) - Math.max(start, bStart));
-    workMinutes -= overlap;
-  });
-
-  const actual = roundToHalfHour(workMinutes);
-
-  // Normal overtime
-  let normalOt = "";
-  if (!["土", "日"].includes(weekday) && actual >= 9) {
-    const roundedNormalOt = roundToHalfHour((actual - 8) * 60);
-    normalOt = roundedNormalOt < 1 ? "" : String(roundedNormalOt);
-  }
-
-  // Midnight overtime (22:30 - 4:00)
-  let midnightOtMinutes = 0;
-  const midnightRanges = [
-    [22 * 60 + 30, 24 * 60],
-    [0, 4 * 60],
-  ];
-  midnightRanges.forEach(([mStart, mEnd]) => {
-    const overlap = Math.max(0, Math.min(end, mEnd) - Math.max(start, mStart));
-    breaks.forEach(([bStart, bEnd]) => {
-      if (bEnd <= mStart || bStart >= mEnd) return;
-      const bOverlap = Math.max(0, Math.min(mEnd, bEnd) - Math.max(mStart, bStart));
-      midnightOtMinutes -= bOverlap;
-    });
-    midnightOtMinutes += overlap;
-  });
-
-  const midnightOt = midnightOtMinutes > 0 ? roundToHalfHour(midnightOtMinutes) : "";
-
-  return { actual, normalOt, midnightOt };
 }
 
 // ===== Main Component =====
@@ -213,35 +153,8 @@ export default function UserRecordsPage() {
 
   // ✅ Export Excel
   const handleExportExcel = () => {
-    const selectedUserName =
-      users.find((u) => u.id === selectedUser)?.firstname +
-        " " +
-        users.find((u) => u.id === selectedUser)?.lastname || "";
-
-    const tableName = `${selectedUserName} ${year}年${month}月の勤務表`;
-    const wsData = [
-      ["日付", "曜日", "出勤時刻", "退勤時刻", "実働時間", "普通残業", "深夜残業"],
-      ...records.map((rec) => {
-        const { actual, normalOt, midnightOt } = calcWorkTimes(
-          rec.checkin || "",
-          rec.checkout || "",
-          rec.weekday
-        );
-        return [
-          rec.day,
-          rec.weekday,
-          rec.checkin || "-",
-          rec.checkout || "-",
-          actual || "",
-          normalOt || "",
-          midnightOt || "",
-        ];
-      }),
-    ];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, `${tableName}.xlsx`);
+    if (records.length === 0 || !selectedUser) return;
+    exportAttendanceExcel(records, users, selectedUser, year, month);
   };
 
   if (authLoading) {
