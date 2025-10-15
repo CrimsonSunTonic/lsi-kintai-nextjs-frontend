@@ -45,9 +45,9 @@ export default function AdminPage() {
         管理ページへようこそ！
       </Typography>
 
-      {/* <Typography variant="h6">
-        管理者名: {user?.firstname} {user?.lastname}
-      </Typography> */}
+      { <Typography variant="h5" color="textSecondary">
+        {user?.firstname} {user?.lastname} さん
+      </Typography> }
     </Container>
   );
 }
