@@ -4,13 +4,6 @@ import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Paper,
   Alert,
   Container,
   FormControl,
@@ -18,15 +11,12 @@ import {
   Select,
   MenuItem,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { getAttendanceMonthlyClient } from "@/api/attendance/getAttendanceMonthlyClient";
 import { getAllUsersClient } from "@/api/user/getAllUsersClient";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import AttendanceTable from "./components/AttendanceTable";
+import MapDialog from "./components/MapDialog";
 import * as XLSX from "xlsx";
 
 interface AttendanceRecord {
@@ -341,7 +331,7 @@ export default function UserRecordsPage() {
             <Button
               variant="outlined"
               color="success"
-              onClick={handleExportExcel}
+              onClick= {handleExportExcel}
               disabled={records.length === 0}
             >
               印刷(エクセル)
@@ -351,40 +341,8 @@ export default function UserRecordsPage() {
 
         {error && <Alert severity="warning">{error}</Alert>}
 
-        {/* 🗺️ Popup Map Dialog */}
-        <Dialog
-          open={!!selectedLocation}
-          onClose={() => setSelectedLocation(null)}
-          fullWidth
-          maxWidth="lg"
-        >
-          <DialogTitle
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            {selectedLocation?.label
-              ? `${selectedLocation.label} の位置 (${selectedLocation.time})`
-              : "地図の表示"}
-            <IconButton onClick={() => setSelectedLocation(null)}>
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-
-          <DialogContent sx={{ p: 0 }}>
-            {selectedLocation && (
-              <iframe
-                src={`https://www.google.com/maps?q=${selectedLocation.lat},${selectedLocation.lng}&hl=ja&z=16&output=embed`}
-                width="100%"
-                height="450px"
-                style={{ border: 0 }}
-                loading="lazy"
-              ></iframe>
-            )}
-          </DialogContent>
-        </Dialog>
+        {/* Map Dialog */}
+        <MapDialog location={selectedLocation} onClose={() => setSelectedLocation(null)} />
 
         {!error && records.length > 0 && (
           <>
@@ -392,99 +350,10 @@ export default function UserRecordsPage() {
               variant="h6"
               sx={{ fontWeight: "bold", mb: 2, textAlign: "center", color: "#333" }}
             >
-              {selectedUserName}　{year}年{month}月の勤務表
+              {selectedUserName} {year}年{month}月の勤務表
             </Typography>
 
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: "bold" }}>日付</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>曜日</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>出勤時刻</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>退勤時刻</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>実働時間</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>普通残業</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>深夜残業</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {records.map((rec) => {
-                    const { actual, normalOt, midnightOt } = calcWorkTimes(
-                      rec.checkin || "",
-                      rec.checkout || "",
-                      rec.weekday
-                    );
-
-                    let bgColor = "inherit";
-                    let textColor = "inherit";
-                    if (rec.weekday === "土") {
-                      bgColor = "#e3f2fd";
-                      textColor = "#0d47a1";
-                    } else if (rec.weekday === "日") {
-                      bgColor = "#ffebee";
-                      textColor = "#b71c1c";
-                    }
-
-                    return (
-                      <TableRow key={rec.day} sx={{ backgroundColor: bgColor }}>
-                        <TableCell sx={{ color: textColor, fontWeight: "bold" }}>{rec.day}</TableCell>
-                        <TableCell sx={{ color: textColor, fontWeight: "bold" }}>
-                          {rec.weekday}
-                        </TableCell>
-
-                        {/* ✅ Clickable Checkin */}
-                        <TableCell
-                          sx={{
-                            color: rec.checkinLoc ? "green" : "inherit",
-                            textDecoration: rec.checkinLoc ? "underline" : "none",
-                            cursor: rec.checkinLoc ? "pointer" : "default",
-                            fontWeight: "bold",
-                          }}
-                          onClick={() =>
-                            rec.checkinLoc &&
-                            handleShowMap(
-                              rec.checkinLoc[0],
-                              rec.checkinLoc[1],
-                              "出勤位置",
-                              rec.checkin || ""
-                            )
-                          }
-                        >
-                          {rec.checkin || "-"}
-                        </TableCell>
-
-                        {/* ✅ Clickable Checkout */}
-                        <TableCell
-                          sx={{
-                            color: rec.checkoutLoc ? "red" : "inherit",
-                            textDecoration: rec.checkoutLoc ? "underline" : "none",
-                            cursor: rec.checkoutLoc ? "pointer" : "default",
-                            fontWeight: "bold",
-                          }}
-                          onClick={() =>
-                            rec.checkoutLoc &&
-                            handleShowMap(
-                              rec.checkoutLoc[0],
-                              rec.checkoutLoc[1],
-                              "退勤位置",
-                              rec.checkout || ""
-                            )
-                          }
-                        >
-                          {rec.checkout || "-"}
-                        </TableCell>
-
-                        <TableCell sx={{ fontWeight: "bold" }}>{actual || ""}</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>{normalOt || ""}</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>{midnightOt || ""}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <AttendanceTable records={records} onShowMap={handleShowMap} />
           </>
         )}
       </Box>
