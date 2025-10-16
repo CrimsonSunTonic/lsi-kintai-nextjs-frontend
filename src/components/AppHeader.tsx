@@ -33,7 +33,10 @@ const AppHeader = ({ user }: { user: UserData }) => {
 
   const menuItems =
     user.role === "ADMIN"
-      ? [{ label: "勤怠管理・履歴", path: "/admin/records" }]
+      ? [ 
+          {label: "社員管理", path: "/admin/dashboard" }, 
+          { label: "勤怠履歴", path: "/admin/records" }
+        ]
       : [{ label: "勤怠登録", path: "/user/attendance" }];
 
   return (

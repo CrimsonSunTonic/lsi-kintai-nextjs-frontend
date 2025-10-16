@@ -11,7 +11,7 @@ export default function PrivateHome() {
     async function redirectByRole() {
       const user = await getUserClient();
       if (!user) router.push("/signin");
-      else if (user.role === "ADMIN") router.push("/admin/records");
+      else if (user.role === "ADMIN") router.push("/admin");
       else router.push("/user/attendance");
     }
     redirectByRole();
