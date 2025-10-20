@@ -11,6 +11,7 @@ import {
   Select,
   MenuItem,
   Button,
+  Divider,
 } from "@mui/material";
 import { getAttendanceMonthlyClient } from "@/api/attendance/getAttendanceMonthlyClient";
 import { getAllUsersClient } from "@/api/user/getAllUsersClient";
@@ -184,92 +185,90 @@ export default function UserRecordsPage() {
 
   // ===== JSX Layout =====
   return (
-    <Container maxWidth="xl" sx={{ width: "100%", maxWidth: "1600px", px: 3 }}>
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h4" mb={3} fontWeight="bold" color="primary">
-          勤怠記録管理
-        </Typography>
-
-        {/* Controls */}
-        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", flex: 1 }}>
-            <FormControl sx={{ minWidth: 180 }}>
-              <InputLabel>社員選択</InputLabel>
-              <Select
-                value={selectedUser}
-                label="User"
-                onChange={(e) => setSelectedUser(Number(e.target.value))}
-              >
-                {users.map((u) => (
-                  <MenuItem key={u.id} value={u.id}>
-                    {u.firstname} {u.lastname}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>月</InputLabel>
-              <Select value={month} label="Month" onChange={(e) => setMonth(Number(e.target.value))}>
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                  <MenuItem key={m} value={m}>
-                    {m}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>年</InputLabel>
-              <Select value={year} label="Year" onChange={(e) => setYear(Number(e.target.value))}>
-                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((y) => (
-                  <MenuItem key={y} value={y}>
-                    {y}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleFetch}
-              disabled={dataLoading}
+    <Box>
+      <Typography variant="h4" mb={3} fontWeight="bold" color="primary">
+        勤怠記録管理
+      </Typography>
+      <Divider sx={{ mb: 3 }} />
+      {/* Controls */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", flex: 1 }}>
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>社員選択</InputLabel>
+            <Select
+              value={selectedUser}
+              label="User"
+              onChange={(e) => setSelectedUser(Number(e.target.value))}
             >
-              {dataLoading ? "読み込み中..." : "確認"}
-            </Button>
-          </Box>
+              {users.map((u) => (
+                <MenuItem key={u.id} value={u.id}>
+                  {u.firstname} {u.lastname}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
-            <Button
-              variant="outlined"
-              color="success"
-              onClick= {handleExportExcel}
-              disabled={records.length === 0}
-            >
-              印刷(エクセル)
-            </Button>
-          </Box>
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>月</InputLabel>
+            <Select value={month} label="Month" onChange={(e) => setMonth(Number(e.target.value))}>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <MenuItem key={m} value={m}>
+                  {m}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>年</InputLabel>
+            <Select value={year} label="Year" onChange={(e) => setYear(Number(e.target.value))}>
+              {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                <MenuItem key={y} value={y}>
+                  {y}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleFetch}
+            disabled={dataLoading}
+          >
+            {dataLoading ? "読み込み中..." : "確認"}
+          </Button>
         </Box>
 
-        {error && <Alert severity="warning">{error}</Alert>}
-
-        {/* Map Dialog */}
-        <MapDialog location={selectedLocation} onClose={() => setSelectedLocation(null)} />
-
-        {!error && records.length > 0 && (
-          <>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", mb: 2, textAlign: "center", color: "#333" }}
-            >
-              {selectedUserName} {year}年{month}月の勤務表
-            </Typography>
-
-            <AttendanceTable records={records} onShowMap={handleShowMap} />
-          </>
-        )}
+        <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick= {handleExportExcel}
+            disabled={records.length === 0}
+          >
+            印刷(エクセル)
+          </Button>
+        </Box>
       </Box>
-    </Container>
+
+      {error && <Alert severity="warning">{error}</Alert>}
+
+      {/* Map Dialog */}
+      <MapDialog location={selectedLocation} onClose={() => setSelectedLocation(null)} />
+
+      {!error && records.length > 0 && (
+        <>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: "bold", mb: 2, textAlign: "center", color: "#333" }}
+          >
+            {selectedUserName} {year}年{month}月の勤務表
+          </Typography>
+
+          <AttendanceTable records={records} onShowMap={handleShowMap} />
+        </>
+      )}
+    </Box>
   );
 }
