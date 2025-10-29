@@ -8,13 +8,13 @@ export interface Attendance {
   updatedAt: string;
   userId: number;
   date: string;
-  status: "checkin" | "checkout";
+  status: "checkin" | "checkout" | "lunchin" | "lunchout";
   latitude: number;
   longitude: number;
 }
 
 export async function sendAttendance(
-  status: "checkin" | "checkout",
+  status: "checkin" | "checkout" | "lunchin" | "lunchout",
   latitude: number,
   longitude: number
 ): Promise<Attendance | null> {

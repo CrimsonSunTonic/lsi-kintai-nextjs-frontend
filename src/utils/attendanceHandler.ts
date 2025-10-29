@@ -11,7 +11,7 @@ export interface AttendanceResult {
  * @param status "checkin" | "checkout"
  */
 export const handleAttendanceAction = async (
-  status: "checkin" | "checkout"
+  status: "checkin" | "checkout" | "lunchin" | "lunchout"
 ): Promise<AttendanceResult> => {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {

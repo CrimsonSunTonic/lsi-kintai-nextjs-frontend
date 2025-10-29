@@ -39,6 +39,8 @@ export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  const [loadingSave, setLoadingSave] = useState(false);
 
   // Fetch users
   useEffect(() => {
@@ -57,6 +59,9 @@ export default function AdminUsersPage() {
 
   const handleSave = async (form: UpdateUser) => {
     const handle_type = editingUser ? "更新" : "追加";
+
+    setLoadingSave(true);
+
     try {
       if (editingUser) {
         await updateUserClient(editingUser.id, form);
@@ -76,6 +81,8 @@ export default function AdminUsersPage() {
       setEditingUser(null);
       setOpen(false);
     }
+
+    setLoadingSave(false);
   };
 
 
@@ -132,17 +139,17 @@ export default function AdminUsersPage() {
             setOpen(true);
           }}
         >
-          Create
+          作成
         </Button>
       </Box>
 
       <UsersTable
         data={users}
         columns={[
-          { id: "email", label: "Email" },
-          { id: "firstname", label: "Firstname" },
-          { id: "lastname", label: "Lastname" },
-          { id: "role", label: "Role" },
+          { id: "email", label: "メールアドレス" },
+          { id: "firstname", label: "名" },
+          { id: "lastname", label: "姓" },
+          { id: "role", label: "役割" },
           {
             id: "actions",
             label: "",
@@ -174,6 +181,7 @@ export default function AdminUsersPage() {
 
       <UserDialog
         open={open}
+        loadingSave={loadingSave}
         onClose={() => setOpen(false)}
         onSubmit={handleSave}
         editingUser={editingUser}

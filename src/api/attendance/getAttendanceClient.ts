@@ -6,7 +6,7 @@ export interface AttendanceRecord {
   updatedAt: string;
   userId: number;
   date: string;
-  status: "checkin" | "checkout";
+  status: "checkin" | "checkout" | "lunchin" | "lunchout";
   latitude: number;
   longitude: number;
 }

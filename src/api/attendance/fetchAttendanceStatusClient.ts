@@ -2,7 +2,7 @@ import { apiClient } from "@/utils/apiClient";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export async function fetchAttendanceStatus(): Promise<{ checkedIn: boolean; checkedOut: boolean }> {
+export async function fetchAttendanceStatus(): Promise<{ checkedIn: boolean; checkedOut: boolean; lunchIn: boolean; lunchOut: boolean }> {
   const token = localStorage.getItem("access_token");
   if (!token) throw new Error("アクセストークンが見つかりません");
 

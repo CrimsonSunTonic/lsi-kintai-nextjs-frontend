@@ -9,15 +9,15 @@ import {
   Button,
   MenuItem,
   Stack,
+  CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
 const ROLES = ["ADMIN", "USER"];
 
-export default function UserDialog({ open, onClose, onSubmit, editingUser }: any) {
+export default function UserDialog({ open, loadingSave, onClose, onSubmit, editingUser }: any) {
   const [form, setForm] = useState({
     email: "",
-    password: "",
     firstname: "",
     lastname: "",
     role: "USER",
@@ -27,7 +27,6 @@ export default function UserDialog({ open, onClose, onSubmit, editingUser }: any
     if (editingUser) {
       setForm({
         email: editingUser.email,
-        password: "",
         firstname: editingUser.firstname,
         lastname: editingUser.lastname,
         role: editingUser.role,
@@ -35,7 +34,6 @@ export default function UserDialog({ open, onClose, onSubmit, editingUser }: any
     } else {
       setForm({
         email: "",
-        password: "",
         firstname: "",
         lastname: "",
         role: "engineer",
@@ -45,39 +43,30 @@ export default function UserDialog({ open, onClose, onSubmit, editingUser }: any
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>{editingUser ? "Edit User" : "Create User"}</DialogTitle>
+      <DialogTitle>{editingUser ? "ユーザー更新" : "ユーザー作成"}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <TextField
-            label="Email"
+            label="メールアドレス"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             fullWidth
           />
-          {!editingUser && (
-            <TextField
-              label="Password"
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              fullWidth
-            />
-          )}
           <TextField
-            label="First name"
+            label="名"
             value={form.firstname}
             onChange={(e) => setForm({ ...form, firstname: e.target.value })}
             fullWidth
           />
           <TextField
-            label="Last name"
+            label="姓"
             value={form.lastname}
             onChange={(e) => setForm({ ...form, lastname: e.target.value })}
             fullWidth
           />
           <TextField
             select
-            label="Role"
+            label="役割"
             value={form.role}
             onChange={(e) => setForm({ ...form, role: e.target.value })}
           >
@@ -92,7 +81,7 @@ export default function UserDialog({ open, onClose, onSubmit, editingUser }: any
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button variant="contained" onClick={() => onSubmit(form)}>
-          Save
+          {loadingSave ? ( <CircularProgress size={24} color="inherit" /> ) : ("保存")}
         </Button>
       </DialogActions>
     </Dialog>

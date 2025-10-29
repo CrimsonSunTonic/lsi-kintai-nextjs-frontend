@@ -82,7 +82,7 @@ export default function DataTable<T extends { [key: string]: any }>({
       <Box mb={3} className="flex justify-end">
         <TextField
           size="small"
-          placeholder="Search..."
+          placeholder="検査..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-64 rounded-lg"
