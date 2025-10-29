@@ -1,3 +1,5 @@
+import { apiClient } from "@/utils/apiClient";
+
 export interface AttendanceRecord {
   id: number;
   createdAt: string;
@@ -16,13 +18,11 @@ export async function getAttendanceClient(): Promise<AttendanceRecord[]> {
   if (!token) return [];
 
   try {
-    const res = await fetch(`${API_BASE}/attendance/me`, {
+    const data = await apiClient(`${API_BASE}/attendance/me`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!res.ok) throw new Error("勤怠記録の取得に失敗しました");
-
-    return await res.json();
+    return data;
   } catch (err) {
     console.error("勤怠記録の取得中にエラーが発生しました:", err);
     return [];

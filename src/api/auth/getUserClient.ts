@@ -1,3 +1,5 @@
+import { apiClient } from "@/utils/apiClient";
+
 export interface UserData {
   id: number;
   email: string;
@@ -13,15 +15,9 @@ export async function getUserClient(): Promise<UserData | null> {
   if (!token) return null;
 
   try {
-    const res = await fetch(`${API_BASE}/user/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const data = await apiClient(`${API_BASE}/user/me`, {});
 
-    if (!res.ok) {
-      console.error("ユーザー情報の取得に失敗しました");
-      return null;
-    }
-    return await res.json();
+    return data;
   } catch (err) {
     console.error("ユーザー情報の取得に失敗しました:", err);
     return null;

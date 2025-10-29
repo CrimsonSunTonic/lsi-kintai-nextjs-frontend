@@ -1,3 +1,5 @@
+import { apiClient } from "@/utils/apiClient";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Attendance {
@@ -20,20 +22,12 @@ export async function sendAttendance(
   if (!token) return null;
 
   try {
-    const res = await fetch(`${API_BASE}/attendance`, {
+    const data = await apiClient(`${API_BASE}/attendance`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify({ status, latitude, longitude }),
     });
 
-    if (!res.ok) {
-      console.error("勤怠の送信に失敗しました");
-      return null;
-    }
-    return await res.json();
+    return data;
   } catch (err) {
     console.error("勤怠の送信中にエラーが発生しました:", err);
     return null;

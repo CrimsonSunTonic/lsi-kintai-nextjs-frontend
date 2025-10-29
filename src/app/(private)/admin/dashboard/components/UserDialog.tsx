@@ -44,7 +44,7 @@ export default function UserDialog({ open, onClose, onSubmit, editingUser }: any
   }, [editingUser]);
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>{editingUser ? "Edit User" : "Create User"}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>

@@ -5,6 +5,17 @@ import { useRouter } from "next/navigation";
 import { getUserClient } from "@/api/auth/getUserClient";
 import type { UserData } from "@/api/auth/getUserClient";
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const exp = payload.exp; // expiration timestamp (seconds)
+    const now = Math.floor(Date.now() / 1000);
+    return exp < now;
+  } catch {
+    return true;
+  }
+}
+
 export function useAdminAuth() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -14,6 +25,13 @@ export function useAdminAuth() {
     const checkAccess = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
+        router.replace("/signin");
+        return;
+      }
+      
+      if (isTokenExpired(token)) {
+        console.warn("Access token expired");
+        localStorage.removeItem("access_token");
         router.replace("/signin");
         return;
       }

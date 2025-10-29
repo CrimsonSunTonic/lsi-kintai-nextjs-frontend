@@ -1,3 +1,6 @@
+import { apiClient } from "@/utils/apiClient";
+import { header } from "framer-motion/client";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getAttendanceMonthlyClient(
@@ -12,15 +15,13 @@ export async function getAttendanceMonthlyClient(
   formData.append("month", String(month));
   formData.append("year", String(year));
 
-  const res = await fetch(`${API_BASE}/attendance/monthly`, {
+  const data = await apiClient(`${API_BASE}/attendance/monthly`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Bearer ${token}`,
-    },
     body: formData.toString(),
-  });
+  }, "application/x-www-form-urlencoded");
 
-  if (!res.ok) throw new Error("勤怠情報の取得に失敗しました");
-  return res.json();
+  console.log(data);
+  
+
+  return data;
 }

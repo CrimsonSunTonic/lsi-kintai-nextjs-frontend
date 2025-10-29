@@ -29,6 +29,8 @@ import {
   UpdateUser,
 } from "@/api/admin/adminClient";
 import UserDialog from "./components/UserDialog";
+import { confirmDialog, notify } from "@/utils/sweetalertHelp";
+import UsersTable from "./components/UserTable";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -54,35 +56,58 @@ export default function AdminUsersPage() {
   }, []);
 
   const handleSave = async (form: UpdateUser) => {
+    const handle_type = editingUser ? "更新" : "追加";
     try {
       if (editingUser) {
-        console.log("check handleSave form >> ",form);
-        console.log("check handleSave editingUser >> ",editingUser);
         await updateUserClient(editingUser.id, form);
         setUsers((prev) =>
-          prev.map((u) => (u.id === editingUser.id ? { ...u, ...form } : u))
-        );
+            prev.map((u) => (u.id === editingUser.id ? { ...u, ...form } : u))
+          );
       } else {
-        const res = await createUserClient(form);
-        setUsers((prev) => [...prev, res.user]);
+        await createUserClient(form);
+        const data = await getAllUsersClient();
+        setUsers(data);
       }
+
+      notify("success", `${handle_type}しました!`, `ユーザー${handle_type}が成功しました。`);
     } catch (e) {
-      console.error(e);
+      notify("error", "エラー!", `ユーザー${handle_type}が失敗しました。`);
     } finally {
       setEditingUser(null);
       setOpen(false);
     }
   };
 
+
+
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure to delete this user?")) return;
-    await deleteUserClient(id);
-    setUsers((prev) => prev.filter((u) => u.id !== id));
+    const confirmed = await confirmDialog({
+      title: "削除確認",
+      text: "このユーザーを削除しますか?",
+      icon: "warning",
+      confirmButtonText: "削除",
+      cancelButtonText: "キャンセル",
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await deleteUserClient(id);
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+      notify("success", "削除しました!", "ユーザー削除が成功しました。");
+    } catch (err) {
+      notify("error", "エラー!", "ユーザー削除が失敗しました。");
+    }
   };
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="80vh"
+      >
         <CircularProgress />
       </Box>
     );
@@ -111,62 +136,41 @@ export default function AdminUsersPage() {
         </Button>
       </Box>
 
-      <Paper sx={{ borderRadius: 2, boxShadow: 1 }}>
-        <TableContainer>
-          <Table>
-            <TableHead sx={{ backgroundColor: "#f9fafb" }}>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Firstname</TableCell>
-                <TableCell>Lastname</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell align="right"></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((u) => (
-                  <TableRow key={u.id} hover>
-                    <TableCell>{u.id}</TableCell>
-                    <TableCell>{u.email}</TableCell>
-                    <TableCell>{u.firstname}</TableCell>
-                    <TableCell>{u.lastname}</TableCell>
-                    <TableCell>{u.role}</TableCell>
-                    <TableCell align="right">
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                          setEditingUser(u);
-                          setOpen(true);
-                        }}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => handleDelete(u.id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          component="div"
-          count={users.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
-        />
-      </Paper>
+      <UsersTable
+        data={users}
+        columns={[
+          { id: "email", label: "Email" },
+          { id: "firstname", label: "Firstname" },
+          { id: "lastname", label: "Lastname" },
+          { id: "role", label: "Role" },
+          {
+            id: "actions",
+            label: "",
+            render: (u) => (
+              <Box className="flex gap-1 justify-end">
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    setEditingUser(u);
+                    setOpen(true);
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={() => handleDelete(u.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ),
+          },
+        ]}
+      />
+
 
       <UserDialog
         open={open}
