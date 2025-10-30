@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getUserClient, UserData } from "../../api/auth/getUserClient";
 import AppHeader from "@/components/AppHeader";
-import { CircularProgress, Box } from "@mui/material";
 
 export default function PrivateLayout({
   children,
@@ -27,15 +26,20 @@ export default function PrivateLayout({
 
   if (loading)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-        <CircularProgress />
-      </Box>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">読み込み中...</p>
+        </div>
+      </div>
     );
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {user && <AppHeader user={user} />}
-      <Box sx={{ mt: 8 }}>{children}</Box>
-    </>
+      <main className="pt-16"> {/* Add padding top to account for fixed header */}
+        {children}
+      </main>
+    </div>
   );
 }

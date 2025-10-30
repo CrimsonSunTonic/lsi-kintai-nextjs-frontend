@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CircularProgress, Box, Typography } from "@mui/material";
 import { getUserClient } from "../api/auth/getUserClient";
 
 export default function HomePage() {
@@ -21,12 +20,11 @@ export default function HomePage() {
       // Has token → verify it with backend
       const user = await getUserClient();
       if (user) {
-
         // Redirect based on role
         if (user.role === "ADMIN") {
           router.replace("/admin/");
         } else {
-          router.replace("/user/attendance");
+          router.replace("/user/");
         }
       } else {
         // invalid token → redirect to signin
@@ -39,20 +37,9 @@ export default function HomePage() {
   }, [router]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        gap: 2,
-      }}
-    >
-      <CircularProgress />
-      <Typography variant="h6" color="primary">
-        認証確認中...
-      </Typography>
-    </Box>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col items-center justify-center space-y-4">
+      <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-xl font-semibold text-blue-600">認証確認中...</p>
+    </div>
   );
 }

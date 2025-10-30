@@ -1,22 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  Container,
-  FormControl,
-  FormLabel,
-  Link,
-  TextField,
-  Typography,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
 import { useRouter } from "next/navigation";
 import { signup } from "../../../api/auth/signupClient";
 
@@ -122,195 +106,231 @@ const SignupForm = () => {
     router.push("/signin");
   };
 
+  const getEmailHelperText = () => {
+    if (emailError === "Email should not be empty") return "メールアドレスを入力してください";
+    if (emailError === "Email must be a valid email address") return "有効なメールアドレスを入力してください";
+    return emailError;
+  };
+
+  const getPasswordHelperText = () => {
+    if (passwordError === "Password should not be empty") return "パスワードを入力してください";
+    if (passwordError === "Password must be at least 8 characters long") return "パスワードは8文字以上で入力してください";
+    return passwordError;
+  };
+
+  const getRepeatPasswordHelperText = () => {
+    if (repeatPasswordError === "Please confirm your password") return "パスワードを再入力してください";
+    if (repeatPasswordError === "Passwords do not match") return "パスワードが一致しません";
+    return repeatPasswordError;
+  };
+
+  const getFirstnameHelperText = () => {
+    if (firstnameError === "First name should not be empty") return "名を入力してください";
+    return firstnameError;
+  };
+
+  const getLastnameHelperText = () => {
+    if (lastnameError === "Last name should not be empty") return "姓を入力してください";
+    return lastnameError;
+  };
+
   return (
-    <Container
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f5f5f5",
-      }}
-    >
-      <Card
-        variant="outlined"
-        sx={{
-          p: 4,
-          boxShadow: 4,
-          borderRadius: 3,
-          border: "1px solid",
-          borderColor: "divider",
-          width: "100%",
-          maxWidth: 400,
-        }}
-      >
-        <Typography
-          component="h1"
-          variant="h4"
-          sx={{
-            textAlign: "center",
-            fontSize: "clamp(2rem, 10vw, 2.15rem)",
-            mb: 2,
-            fontWeight: "bold",
-          }}
-        >
-          新規登録
-        </Typography>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 transition-all duration-300 hover:shadow-2xl">
+          <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
+            新規登録
+          </h1>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 transition-all duration-300">
+              {error}
+            </div>
+          )}
 
-        <Box
-          component="form"
-          noValidate
-          onSubmit={handleSubmit}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <FormControl>
-            <FormLabel>メールアドレス</FormLabel>
-            <TextField
-              type="email"
-              placeholder="tarou@email.com"
-              autoComplete="email"
-              fullWidth
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={!!emailError}
-              helperText={emailError && (
-                emailError === "Email should not be empty"
-                  ? "メールアドレスを入力してください"
-                  : emailError === "Email must be a valid email address"
-                  ? "有効なメールアドレスを入力してください"
-                  : emailError
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                メールアドレス
+              </label>
+              <input
+                type="email"
+                placeholder="tarou@email.com"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                  emailError 
+                    ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
+                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                }`}
+              />
+              {emailError && (
+                <p className="text-red-600 text-sm mt-1 animate-pulse">
+                  {getEmailHelperText()}
+                </p>
               )}
-            />
-          </FormControl>
+            </div>
 
-          <FormControl>
-            <FormLabel>パスワード</FormLabel>
-            <TextField
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              fullWidth
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={!!passwordError}
-              helperText={passwordError && (
-                passwordError === "Password should not be empty"
-                  ? "パスワードを入力してください"
-                  : passwordError === "Password must be at least 8 characters long"
-                  ? "パスワードは8文字以上で入力してください"
-                  : passwordError
+            {/* Password */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                パスワード
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                  passwordError 
+                    ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
+                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                }`}
+              />
+              {passwordError && (
+                <p className="text-red-600 text-sm mt-1 animate-pulse">
+                  {getPasswordHelperText()}
+                </p>
               )}
-            />
-          </FormControl>
+            </div>
 
-          <FormControl>
-            <FormLabel>パスワード（確認）</FormLabel>
-            <TextField
-              type="password"
-              placeholder="もう一度パスワードを入力してください"
-              fullWidth
-              required
-              value={repeatPassword}
-              onChange={(e) => handleRepeatPasswordChange(e.target.value)}
-              error={!!repeatPasswordError}
-              helperText={repeatPasswordError && (
-                repeatPasswordError === "Please confirm your password"
-                  ? "パスワードを再入力してください"
-                  : repeatPasswordError === "Passwords do not match"
-                  ? "パスワードが一致しません"
-                  : repeatPasswordError
+            {/* Repeat Password */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                パスワード（確認）
+              </label>
+              <input
+                type="password"
+                placeholder="もう一度パスワードを入力してください"
+                required
+                value={repeatPassword}
+                onChange={(e) => handleRepeatPasswordChange(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                  repeatPasswordError 
+                    ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
+                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                }`}
+              />
+              {repeatPasswordError && (
+                <p className="text-red-600 text-sm mt-1 animate-pulse">
+                  {getRepeatPasswordHelperText()}
+                </p>
               )}
-            />
-          </FormControl>
+            </div>
 
-          <FormControl>
-            <FormLabel>名</FormLabel>
-            <TextField
-              placeholder="名を入力してください"
-              fullWidth
-              required
-              value={firstname}
-              onChange={(e) => setFirstname(e.target.value)}
-              error={!!firstnameError}
-              helperText={firstnameError && (
-                firstnameError === "First name should not be empty"
-                  ? "名を入力してください"
-                  : firstnameError
+            {/* First Name */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                名
+              </label>
+              <input
+                placeholder="名を入力してください"
+                required
+                value={firstname}
+                onChange={(e) => setFirstname(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                  firstnameError 
+                    ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
+                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                }`}
+              />
+              {firstnameError && (
+                <p className="text-red-600 text-sm mt-1 animate-pulse">
+                  {getFirstnameHelperText()}
+                </p>
               )}
-            />
-          </FormControl>
+            </div>
 
-          <FormControl>
-            <FormLabel>姓</FormLabel>
-            <TextField
-              placeholder="姓を入力してください"
-              fullWidth
-              required
-              value={lastname}
-              onChange={(e) => setLastname(e.target.value)}
-              error={!!lastnameError}
-              helperText={lastnameError && (
-                lastnameError === "Last name should not be empty"
-                  ? "姓を入力してください"
-                  : lastnameError
+            {/* Last Name */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                姓
+              </label>
+              <input
+                placeholder="姓を入力してください"
+                required
+                value={lastname}
+                onChange={(e) => setLastname(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                  lastnameError 
+                    ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
+                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                }`}
+              />
+              {lastnameError && (
+                <p className="text-red-600 text-sm mt-1 animate-pulse">
+                  {getLastnameHelperText()}
+                </p>
               )}
-            />
-          </FormControl>
+            </div>
 
-          <Button type="submit" fullWidth variant="contained" disabled={loading}>
-            {loading ? "登録中..." : "新規登録"}
-          </Button>
-        </Box>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-300 ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              }`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  登録中...
+                </span>
+              ) : (
+                "新規登録"
+              )}
+            </button>
+          </form>
 
-        <Box sx={{ mt: 3, textAlign: "center" }}>
-          <Typography variant="body2">
-            すでにアカウントをお持ちですか？{" "}
-            <Link href="/signin" underline="hover">
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-gray-600 text-sm">
+              すでにアカウントをお持ちですか？
+            </p>
+            <a 
+              href="/signin" 
+              className="inline-block text-green-600 hover:text-green-800 font-medium transition-colors duration-200 hover:underline"
+            >
               ログイン
-            </Link>
-          </Typography>
-        </Box>
-      </Card>
+            </a>
+          </div>
+        </div>
+      </div>
 
       {/* ✅ Success Dialog */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>
-          🎉 登録が完了しました！
-        </DialogTitle>
-        <DialogContent
-          dividers
-          sx={{
-            textAlign: "center",
-            fontSize: "1.1rem",
-            color: "text.secondary",
-          }}
-        >
-          アカウントが正常に作成されました。
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleDialogClose}
-            sx={{ px: 4 }}
-          >
-            ログイン画面へ
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+      {openDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full transform animate-scaleIn">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🎉</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                登録が完了しました！
+              </h3>
+              <p className="text-gray-600 mb-6">
+                アカウントが正常に作成されました。
+              </p>
+              <button
+                onClick={handleDialogClose}
+                className="w-full py-3 px-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                ログイン画面へ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

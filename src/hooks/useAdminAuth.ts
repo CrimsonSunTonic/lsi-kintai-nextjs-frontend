@@ -45,7 +45,7 @@ export function useAdminAuth() {
 
       // Redirect if not admin
       if (userData.role !== "ADMIN") {
-        router.replace("/user/attendance");
+        router.replace("/user");
         return;
       }
 
