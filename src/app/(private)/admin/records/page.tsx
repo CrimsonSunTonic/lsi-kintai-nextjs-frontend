@@ -168,7 +168,7 @@ export default function UserRecordsPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">
                 勤怠記録管理
               </h1>
               <p className="text-gray-600 text-lg">
@@ -188,18 +188,25 @@ export default function UserRecordsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   社員選択
                 </label>
-                <select
-                  value={selectedUser}
-                  onChange={(e) => setSelectedUser(Number(e.target.value))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
-                >
-                  <option value="">社員を選択</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.firstname} {u.lastname}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedUser}
+                    onChange={(e) => setSelectedUser(Number(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white text-gray-800 appearance-none cursor-pointer hover:border-gray-400"
+                  >
+                    <option value="" className="text-gray-400">社員を選択</option>
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id} className="text-gray-800">
+                        {u.firstname} {u.lastname}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Month Select */}
@@ -207,17 +214,24 @@ export default function UserRecordsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   月
                 </label>
-                <select
-                  value={month}
-                  onChange={(e) => setMonth(Number(e.target.value))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                    <option key={m} value={m}>
-                      {m}月
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={month}
+                    onChange={(e) => setMonth(Number(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white text-gray-800 appearance-none cursor-pointer hover:border-gray-400"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                      <option key={m} value={m} className="text-gray-800">
+                        {m}月
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Year Select */}
@@ -225,17 +239,24 @@ export default function UserRecordsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   年
                 </label>
-                <select
-                  value={year}
-                  onChange={(e) => setYear(Number(e.target.value))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
-                >
-                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((y) => (
-                    <option key={y} value={y}>
-                      {y}年
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={year}
+                    onChange={(e) => setYear(Number(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white text-gray-800 appearance-none cursor-pointer hover:border-gray-400"
+                  >
+                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                      <option key={y} value={y} className="text-gray-800">
+                        {y}年
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -290,7 +311,7 @@ export default function UserRecordsPage() {
         {!error && records.length > 0 && (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-800">
                 {selectedUserName} {year}年{month}月の勤務表
               </h2>
               <p className="text-gray-600 mt-1">
@@ -311,7 +332,7 @@ export default function UserRecordsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">勤怠記録がありません</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">勤怠記録がありません</h3>
               <p className="text-gray-600 mb-6">
                 社員と期間を選択して「確認」ボタンをクリックすると、勤怠記録が表示されます。
               </p>

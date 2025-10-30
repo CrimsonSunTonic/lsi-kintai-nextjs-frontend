@@ -39,7 +39,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col items-center justify-center space-y-4">
       <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      <p className="text-xl font-semibold text-blue-600">認証確認中...</p>
+      <p className="text-xl font-semibold text-blue-700">認証確認中...</p>
     </div>
   );
 }

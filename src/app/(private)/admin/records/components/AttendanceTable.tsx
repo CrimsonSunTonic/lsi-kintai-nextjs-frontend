@@ -43,16 +43,16 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({ records, onShowMap })
               );
 
               let bgColor = "bg-white";
-              let textColor = "text-gray-900";
+              let textColor = "text-gray-800";
               let dayBgColor = "";
 
               if (rec.weekday === "土") {
                 bgColor = "bg-blue-50";
-                textColor = "text-blue-900";
+                textColor = "text-blue-800";
                 dayBgColor = "bg-blue-100";
               } else if (rec.weekday === "日") {
                 bgColor = "bg-red-50";
-                textColor = "text-red-900";
+                textColor = "text-red-800";
                 dayBgColor = "bg-red-100";
               }
 
@@ -60,7 +60,7 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({ records, onShowMap })
                 <tr key={rec.day} className={`${bgColor} hover:bg-gray-50 transition-colors duration-200`}>
                   {/* Date */}
                   <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${textColor}`}>
-                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${dayBgColor}`}>
+                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${dayBgColor} ${textColor}`}>
                       {rec.day}
                     </span>
                   </td>
@@ -80,8 +80,8 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({ records, onShowMap })
                         }
                         className={`font-semibold transition-all duration-200 hover:scale-105 ${
                           rec.checkinLoc 
-                            ? "text-green-600 hover:text-green-800 underline cursor-pointer" 
-                            : "text-gray-600 cursor-default"
+                            ? "text-green-700 hover:text-green-900 underline cursor-pointer" 
+                            : "text-gray-700 cursor-default"
                         }`}
                       >
                         {rec.checkin}
@@ -107,8 +107,8 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({ records, onShowMap })
                         }
                         className={`font-semibold transition-all duration-200 hover:scale-105 ${
                           rec.checkoutLoc 
-                            ? "text-red-600 hover:text-red-800 underline cursor-pointer" 
-                            : "text-gray-600 cursor-default"
+                            ? "text-red-700 hover:text-red-900 underline cursor-pointer" 
+                            : "text-gray-700 cursor-default"
                         }`}
                       >
                         {rec.checkout}
@@ -125,17 +125,17 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({ records, onShowMap })
                   </td>
 
                   {/* Actual Work Time */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">
                     {actual || "-"}
                   </td>
 
                   {/* Normal Overtime */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-orange-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-orange-700">
                     {normalOt || "-"}
                   </td>
 
                   {/* Midnight Overtime */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-purple-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-purple-700">
                     {midnightOt || "-"}
                   </td>
                 </tr>

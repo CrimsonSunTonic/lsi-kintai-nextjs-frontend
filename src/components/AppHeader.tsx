@@ -1,16 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { UserData } from "@/api/auth/getUserClient";
 import Image from "next/image";
 
 const AppHeader = ({ user }: { user: UserData }) => {
   const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
+    localStorage.removeItem("user_role");
     router.push("/signin");
   };
 
@@ -73,20 +88,67 @@ const AppHeader = ({ user }: { user: UserData }) => {
 
           {/* Right Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center space-x-3 bg-gray-50 rounded-xl px-4 py-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                {user.firstname.charAt(0)}
-              </div>
-              <span className="text-gray-700 font-medium">
-                {user.firstname} {user.lastname}
-              </span>
+            {/* Avatar with Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center space-x-3 bg-gray-50 rounded-xl px-4 py-2 hover:bg-gray-100 transition-all duration-200 cursor-pointer"
+              >
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  {user.firstname.charAt(0)}
+                </div>
+                <span className="text-gray-700 font-medium">
+                  {user.firstname} {user.lastname}
+                </span>
+                <svg 
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {dropdownOpen && (
+                <div className="absolute right-0 top-14 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 animate-fadeIn z-50">
+                  {/* User Info */}
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-900">{user.firstname} {user.lastname}</p>
+                    <p className="text-xs text-gray-500 mt-1">{user.email}</p>
+                  </div>
+                  
+                  {/* Change Password */}
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      router.push("/change-password");
+                    }}
+                    className="w-full text-left px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 font-medium flex items-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span>パスワード変更</span>
+                  </button>
+
+                  {/* Logout */}
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full text-left px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200 font-medium flex items-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>ログアウト</span>
+                  </button>
+                </div>
+              )}
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium text-lg"
-            >
-              ログアウト
-            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -107,7 +169,13 @@ const AppHeader = ({ user }: { user: UserData }) => {
       {open && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-lg animate-slideDown">
           <div className="px-4 py-3 space-y-2">
-            {/* Home Link in Mobile Menu */}
+            {/* User Info in Mobile */}
+            <div className="px-4 py-3 bg-gray-50 rounded-xl mb-2">
+              <p className="font-semibold text-gray-900">{user.firstname} {user.lastname}</p>
+              <p className="text-sm text-gray-500">{user.email}</p>
+            </div>
+
+            {/* Home Link */}
             <button
               onClick={() => {
                 setOpen(false);
@@ -133,15 +201,33 @@ const AppHeader = ({ user }: { user: UserData }) => {
                 {item.label}
               </button>
             ))}
+            
+            {/* Change Password in Mobile Menu */}
+            <button
+              onClick={() => {
+                setOpen(false);
+                router.push("/change-password");
+              }}
+              className="w-full text-left px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 font-medium text-lg flex items-center space-x-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>パスワード変更</span>
+            </button>
+            
             <div className="pt-2 border-t border-gray-200">
               <button
                 onClick={() => {
                   setOpen(false);
                   handleLogout();
                 }}
-                className="w-full text-left px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium text-lg"
+                className="w-full text-left px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium text-lg flex items-center space-x-2"
               >
-                ログアウト
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>ログアウト</span>
               </button>
             </div>
           </div>

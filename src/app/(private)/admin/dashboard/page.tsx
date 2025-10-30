@@ -101,7 +101,7 @@ export default function AdminUsersPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">
                 社員管理
               </h1>
               <p className="text-gray-600 text-lg">
@@ -130,7 +130,7 @@ export default function AdminUsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">総従業員数</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{users.length}</p>
+                <p className="text-3xl font-bold text-gray-800 mt-2">{users.length}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@ export default function AdminUsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">管理者</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-3xl font-bold text-gray-800 mt-2">
                   {users.filter(u => u.role === 'ADMIN').length}
                 </p>
               </div>
@@ -160,7 +160,7 @@ export default function AdminUsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">一般ユーザー</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-3xl font-bold text-gray-800 mt-2">
                   {users.filter(u => u.role === 'USER').length}
                 </p>
               </div>
@@ -176,7 +176,7 @@ export default function AdminUsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">アクティブ</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{users.length}</p>
+                <p className="text-3xl font-bold text-gray-800 mt-2">{users.length}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
                 <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +206,7 @@ export default function AdminUsersPage() {
                       setEditingUser(u);
                       setOpen(true);
                     }}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                    className="p-2 text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -217,7 +217,7 @@ export default function AdminUsersPage() {
                       e.stopPropagation();
                       handleDelete(u.id);
                     }}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+                    className="p-2 text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

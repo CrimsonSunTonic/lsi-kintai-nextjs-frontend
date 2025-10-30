@@ -138,7 +138,7 @@ const SignupForm = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 transition-all duration-300 hover:shadow-2xl">
-          <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
+          <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
             新規登録
           </h1>
 
@@ -161,7 +161,7 @@ const SignupForm = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 text-gray-800 placeholder:text-gray-400 ${
                   emailError 
                     ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
                     : "border-gray-300 focus:ring-green-500 focus:border-green-500"
@@ -186,7 +186,7 @@ const SignupForm = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 text-gray-800 placeholder:text-gray-400 ${
                   passwordError 
                     ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
                     : "border-gray-300 focus:ring-green-500 focus:border-green-500"
@@ -210,7 +210,7 @@ const SignupForm = () => {
                 required
                 value={repeatPassword}
                 onChange={(e) => handleRepeatPasswordChange(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 text-gray-800 placeholder:text-gray-400 ${
                   repeatPasswordError 
                     ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
                     : "border-gray-300 focus:ring-green-500 focus:border-green-500"
@@ -233,7 +233,7 @@ const SignupForm = () => {
                 required
                 value={firstname}
                 onChange={(e) => setFirstname(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 text-gray-800 placeholder:text-gray-400 ${
                   firstnameError 
                     ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
                     : "border-gray-300 focus:ring-green-500 focus:border-green-500"
@@ -256,7 +256,7 @@ const SignupForm = () => {
                 required
                 value={lastname}
                 onChange={(e) => setLastname(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 text-gray-800 placeholder:text-gray-400 ${
                   lastnameError 
                     ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
                     : "border-gray-300 focus:ring-green-500 focus:border-green-500"
@@ -314,7 +314,7 @@ const SignupForm = () => {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎉</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
                 登録が完了しました！
               </h3>
               <p className="text-gray-600 mb-6">

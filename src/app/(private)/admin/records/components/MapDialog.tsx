@@ -20,7 +20,7 @@ const MapDialog: React.FC<MapDialogProps> = ({ location, onClose }) => {
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full transform animate-scaleIn">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-gray-800">
               {location.label || "位置情報"}
             </h2>
             {location.time && (
@@ -31,7 +31,7 @@ const MapDialog: React.FC<MapDialogProps> = ({ location, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors duration-200"
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors duration-200"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

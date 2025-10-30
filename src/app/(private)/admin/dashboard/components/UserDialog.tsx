@@ -55,7 +55,7 @@ export default function UserDialog({ open, loadingSave, onClose, onSubmit, editi
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-800">
             {editingUser ? "ユーザー更新" : "ユーザー作成"}
           </h2>
           <p className="text-gray-600 text-sm mt-1">
@@ -72,7 +72,7 @@ export default function UserDialog({ open, loadingSave, onClose, onSubmit, editi
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800 placeholder:text-gray-400"
               placeholder="tarou@example.com"
             />
           </div>
@@ -85,7 +85,7 @@ export default function UserDialog({ open, loadingSave, onClose, onSubmit, editi
               type="text"
               value={form.firstname}
               onChange={(e) => setForm({ ...form, firstname: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800 placeholder:text-gray-400"
               placeholder="太郎"
             />
           </div>
@@ -98,7 +98,7 @@ export default function UserDialog({ open, loadingSave, onClose, onSubmit, editi
               type="text"
               value={form.lastname}
               onChange={(e) => setForm({ ...form, lastname: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800 placeholder:text-gray-400"
               placeholder="山田"
             />
           </div>
@@ -110,10 +110,10 @@ export default function UserDialog({ open, loadingSave, onClose, onSubmit, editi
             <select
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800"
             >
               {ROLES.map((r) => (
-                <option key={r.value} value={r.value}>
+                <option key={r.value} value={r.value} className="text-gray-800">
                   {r.label}
                 </option>
               ))}
