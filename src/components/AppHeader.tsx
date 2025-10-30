@@ -162,7 +162,10 @@ const AppHeader = ({ user }: { user: UserData }) => {
               {menuItems.map((item) => (
                 <MenuItem
                   key={item.label}
-                  onClick={() => router.push(item.path)}
+                      onClick={() => {
+                        setOpen(false);
+                        router.push(item.path);
+                      }}
                   sx={{
                     borderRadius: 1,
                     mb: 1,
@@ -176,13 +179,16 @@ const AppHeader = ({ user }: { user: UserData }) => {
               ))}
               <Divider sx={{ my: 2 }} />
               <MenuItem
-                onClick={handleLogout}
+                  onClick={() => {
+                    setOpen(false);
+                    handleLogout();
+                  }}
                 sx={{
                   borderRadius: 1,
                   "&:hover": { bgcolor: "#f5f5f5" },
                 }}
               >
-                Logout
+                ログアウト
               </MenuItem>
             </Drawer>
           </Box>
