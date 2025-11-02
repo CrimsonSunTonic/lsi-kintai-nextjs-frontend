@@ -1,5 +1,4 @@
 import { apiClient } from "@/utils/apiClient";
-import { header } from "framer-motion/client";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -8,7 +7,6 @@ export async function getAttendanceMonthlyClient(
   month: number,
   year: number
 ) {
-  const token = localStorage.getItem("access_token");
 
   const formData = new URLSearchParams();
   formData.append("userId", String(userId));

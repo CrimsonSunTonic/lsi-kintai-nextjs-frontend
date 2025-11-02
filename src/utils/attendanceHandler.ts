@@ -6,10 +6,6 @@ export interface AttendanceResult {
   success: boolean;
 }
 
-/**
- * Handle attendance submission with geolocation and API call
- * @param status "checkin" | "checkout"
- */
 export const handleAttendanceAction = async (
   status: "checkin" | "checkout" | "lunchin" | "lunchout"
 ): Promise<AttendanceResult> => {
