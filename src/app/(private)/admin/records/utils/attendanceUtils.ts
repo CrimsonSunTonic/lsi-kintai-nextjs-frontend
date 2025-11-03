@@ -1,3 +1,27 @@
+export interface AttendanceRecord {
+  id: number;
+  date: string;
+  status: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface User {
+  id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+}
+
+export interface GroupedRecord {
+  day: number;
+  weekday: string;
+  checkin?: string;
+  checkout?: string;
+  checkinLoc?: [number, number];
+  checkoutLoc?: [number, number];
+}
+
 export function parseTime(str: string) {
   const [h, m] = str.split(":").map(Number);
   return h * 60 + m;

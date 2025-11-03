@@ -1,7 +1,7 @@
-import SignupForm from "./signupform"
+// import SignupForm from "./signupform"
 
-function SignupPage () {
-  return <SignupForm />
-}
+// function SignupPage () {
+//   return <SignupForm />
+// }
 
-export default SignupPage
+// export default SignupPage

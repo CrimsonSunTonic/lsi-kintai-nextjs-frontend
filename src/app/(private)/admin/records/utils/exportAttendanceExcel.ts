@@ -70,9 +70,9 @@ export async function exportAttendanceExcel(
 
     sheet.getCell(`E${row}`).value = rec.checkin || "";
     sheet.getCell(`F${row}`).value = rec.checkout || "";
-    // sheet.getCell(`G${row}`).value = actual || "";
-    // sheet.getCell(`H${row}`).value = normalOt || "";
-    // sheet.getCell(`I${row}`).value = midnightOt || "";
+    sheet.getCell(`G${row}`).value = actual || "";
+    sheet.getCell(`H${row}`).value = normalOt || "";
+    sheet.getCell(`I${row}`).value = midnightOt || "";
     sheet.getCell(`AC${row}`).value = inLocation;
     sheet.getCell(`AD${row}`).value = outLocation;
 
