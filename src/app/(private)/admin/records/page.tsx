@@ -71,55 +71,35 @@ export default function UserRecordsPage() {
     setDataLoading(true);
 
     try {
-      const data: AttendanceRecord[] = await getAttendanceMonthlyClient(selectedUser, month, year);
-
-      const grouped: Record<
-        string,
-        { checkin?: string; checkout?: string; checkinLoc?: [number, number]; checkoutLoc?: [number, number] }
-      > = {};
-
-      data.forEach((rec) => {
-        const dateKey = rec.date.split("T")[0];
-        const time = rec.date.split("T")[1].slice(0, 5);
-
-        if (!grouped[dateKey]) grouped[dateKey] = {};
-
-        if (rec.status === "checkin" && !grouped[dateKey].checkin) {
-          grouped[dateKey].checkin = time;
-          grouped[dateKey].checkinLoc = [rec.latitude, rec.longitude];
-        }
-        if (rec.status === "checkout") {
-          grouped[dateKey].checkout = time;
-          grouped[dateKey].checkoutLoc = [rec.latitude, rec.longitude];
-        }
-      });
+      const data: AttendanceRecord = await getAttendanceMonthlyClient(selectedUser, month, year);
 
       const allDays = generateAllDays(year, month);
+
       const fullRecords = allDays.map((d) => {
         const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(d.day).padStart(2, "0")}`;
-        const dayData = grouped[dateKey] || {};
+        const dayData = data[dateKey] || null;
+
         return {
           day: d.day,
           weekday: d.weekday,
-          checkin: dayData.checkin || "",
-          checkout: dayData.checkout || "",
-          checkinLoc: dayData.checkinLoc,
-          checkoutLoc: dayData.checkoutLoc,
+          data: dayData
         };
       });
 
       setRecords(fullRecords);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("勤怠記録の取得に失敗しました。");
     } finally {
       setDataLoading(false);
     }
   };
 
+
   // ✅ Export Excel
   const handleExportExcel = () => {
     if (records.length === 0 || !selectedUser) return;
-    exportAttendanceExcel(records, users, selectedUser, year, month);
+    // exportAttendanceExcel(records, users, selectedUser, year, month);
   };
 
   if (authLoading) {

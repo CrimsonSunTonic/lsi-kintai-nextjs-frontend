@@ -1,10 +1,25 @@
-export interface AttendanceRecord {
-  id: number;
-  date: string;
-  status: string;
-  latitude: number;
-  longitude: number;
+// export interface AttendanceRecord {
+//   id: number;
+//   date: string;
+//   status: string;
+//   latitude: number;
+//   longitude: number;
+// }
+
+export interface AttendanceEvent {
+  time: string; // "13:38" v.v...
+  loc: [number, number]; // [latitude, longitude]
 }
+
+export interface DailyAttendance {
+  checkin?: AttendanceEvent[];
+  checkout?: AttendanceEvent[];
+  lunchin?: AttendanceEvent[];
+  lunchout?: AttendanceEvent[];
+  workingHours?: number;
+}
+
+export type AttendanceRecord = Record<string, DailyAttendance>;
 
 export interface User {
   id: number;
@@ -16,10 +31,7 @@ export interface User {
 export interface GroupedRecord {
   day: number;
   weekday: string;
-  checkin?: string;
-  checkout?: string;
-  checkinLoc?: [number, number];
-  checkoutLoc?: [number, number];
+  data?: DailyAttendance;
 }
 
 export function parseTime(str: string) {
