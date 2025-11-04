@@ -8,7 +8,7 @@ const PublicLayout = ({ children }: { children: ReactNode }) => {
       {/* Animated Background Elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         {/* Main Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-indigo-600 background-animate-morph"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-indigo-600"></div>
         
         {/* Floating Shapes */}
         <div className="absolute -top-40 -right-32 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float-slow"></div>

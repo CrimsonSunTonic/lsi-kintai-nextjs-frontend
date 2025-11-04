@@ -25,9 +25,9 @@ export default function UserPage() {
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
       <div className="max-w-4xl mx-auto text-center w-full mt-5">
         {/* Welcome Card with Glass Effect */}
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-12 transform transition-all duration-500 hover:shadow-3xl relative overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-12 hover:shadow-3xl relative overflow-hidden">
           {/* Background Glow Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl opacity-20 blur-lg animate-pulse"></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl opacity-20 blur-lg"></div>
           
           <div className="relative">
             {/* Welcome Icon */}
@@ -61,22 +61,22 @@ export default function UserPage() {
             <div className="max-w-md mx-auto">
               <button
                 onClick={handleAttendanceRegistration}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/30 hover:border-green-400/50 hover:shadow-2xl hover:scale-105 transition-all duration-300 group cursor-pointer w-full relative overflow-hidden"
+                className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/30 hover:border-green-400/50 hover:shadow-2xl hover:scale-105 group cursor-pointer w-full relative overflow-hidden"
               >
-                <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl opacity-10 blur-sm group-hover:opacity-20 transition-opacity duration-300"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl opacity-10 blur-sm group-hover:opacity-20"></div>
                 <div className="relative">
-                  <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-600 transition-colors duration-300">
+                  <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-600">
                     <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-green-700 transition-colors duration-300">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-green-700">
                     勤怠登録
                   </h3>
                   <p className="text-gray-600 mb-6 text-lg">出勤・退勤の打刻を行います</p>
-                  <div className="text-green-600 font-semibold text-lg flex items-center justify-center space-x-2 group-hover:space-x-3 transition-all duration-300">
+                  <div className="text-green-600 font-semibold text-lg flex items-center justify-center space-x-2 group-hover:space-x-3">
                     <span>今すぐ開始</span>
-                    <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>

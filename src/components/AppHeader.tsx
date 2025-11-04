@@ -207,12 +207,12 @@ const AppHeader = ({ user }: { user: UserData }) => {
           <div className="md:hidden">
             <button
               onClick={() => setOpen(!open)}
-              className="p-2 rounded-xl text-white hover:bg-white/15 transition-all duration-300 relative group backdrop-blur-sm border border-white/20"
+              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300"
             >
               <div className="w-6 h-6 relative">
-                <span className={`absolute left-0 top-1 w-6 h-0.5 bg-white rounded-full transition-all duration-300 ${open ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-                <span className={`absolute left-0 top-3 w-6 h-0.5 bg-white rounded-full transition-all duration-300 ${open ? 'opacity-0' : 'opacity-100'}`}></span>
-                <span className={`absolute left-0 top-5 w-6 h-0.5 bg-white rounded-full transition-all duration-300 ${open ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+                <span className={`absolute left-0 top-1 w-6 h-0.5 bg-gray-700 rounded-full ${open ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+                <span className={`absolute left-0 top-3 w-6 h-0.5 bg-gray-700 rounded-full ${open ? 'opacity-0' : 'opacity-100'}`}></span>
+                <span className={`absolute left-0 top-5 w-6 h-0.5 bg-gray-700 rounded-full ${open ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
               </div>
             </button>
           </div>
@@ -221,17 +221,14 @@ const AppHeader = ({ user }: { user: UserData }) => {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-white/10 backdrop-blur-2xl border-b border-white/20 shadow-2xl animate-slideDown overflow-hidden">
-          {/* Animated background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-purple-500/20 to-indigo-600/20"></div>
-          
-          <div className="relative px-4 py-3 space-y-2 z-10">
-            {/* User Info in Mobile */}
-            <div className="px-4 py-3 bg-white/15 backdrop-blur-lg rounded-xl mb-2 border border-white/25">
-              <p className="font-semibold text-white drop-shadow-sm">{user.firstname} {user.lastname}</p>
-              <p className="text-sm text-white/80 mt-1">{user.email}</p>
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-white/90 backdrop-blur-2xl border-b border-white/40 shadow-2xl animate-slideDown overflow-hidden">
+          <div className="relative px-4 py-3 space-y-3 z-10">
+            {/* User Info */}
+            <div className="px-4 py-3 bg-gradient-to-r from-blue-50 via-purple-50 to-indigo-50 rounded-xl border border-white/40 shadow-sm">
+              <p className="font-semibold text-gray-900">{user.firstname} {user.lastname}</p>
+              <p className="text-sm text-gray-700 mt-1">{user.email}</p>
               <div className="mt-2">
-                <span className="text-xs bg-white/20 backdrop-blur-sm text-white px-2 py-1 rounded-full border border-white/30">
+                <span className="text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-full shadow-sm">
                   {user.role === "ADMIN" ? "管理者" : "ユーザー"}
                 </span>
               </div>
@@ -243,66 +240,66 @@ const AppHeader = ({ user }: { user: UserData }) => {
                 setOpen(false);
                 handleLogoClick();
               }}
-              className="w-full text-left px-4 py-3 text-white hover:text-white hover:bg-white/15 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 group backdrop-blur-sm border border-white/20"
+              className="w-full text-left px-4 py-3 text-gray-800 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 border border-gray-200 bg-white shadow-sm"
             >
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-white/30">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </div>
               <span>ホーム</span>
             </button>
-            
-            {menuItems.map((item, index) => (
+
+            {/* Menu Items */}
+            {menuItems.map((item) => (
               <button
                 key={item.label}
                 onClick={() => {
                   setOpen(false);
                   router.push(item.path);
                 }}
-                className="w-full text-left px-4 py-3 text-white hover:text-white hover:bg-white/15 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 group backdrop-blur-sm border border-white/20"
-                style={{ animationDelay: `${index * 100 + 200}ms` }}
+                className="w-full text-left px-4 py-3 text-gray-800 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 border border-gray-200 bg-white shadow-sm"
               >
                 <span className="text-lg">{item.icon}</span>
                 <span>{item.label}</span>
               </button>
             ))}
-            
-            {/* Change Password in Mobile Menu */}
+
+            {/* Change Password */}
             <button
               onClick={() => {
                 setOpen(false);
                 router.push("/change-password");
               }}
-              className="w-full text-left px-4 py-3 text-white hover:text-white hover:bg-white/15 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 group border-t border-white/20 mt-2 pt-4 backdrop-blur-sm"
+              className="w-full text-left px-4 py-3 text-gray-800 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 border border-gray-200 bg-white shadow-sm"
             >
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-white/30">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <span>パスワード変更</span>
             </button>
-            
-            <div className="pt-2 border-t border-white/20">
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  handleLogout();
-                    }}
-                className="w-full text-left px-4 py-3 text-white hover:text-red-200 hover:bg-red-500/30 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 group backdrop-blur-sm border border-red-400/30"
-              >
-                <div className="w-8 h-8 bg-red-500/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-red-400/50">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </div>
-                <span>ログアウト</span>
-              </button>
-            </div>
+
+            {/* Logout */}
+            <button
+              onClick={() => {
+                setOpen(false);
+                handleLogout();
+              }}
+              className="w-full text-left px-4 py-3 text-red-700 hover:text-white hover:bg-red-500 rounded-xl transition-all duration-300 font-medium text-lg flex items-center space-x-3 border border-red-300 bg-red-50 shadow-sm"
+            >
+              <div className="w-8 h-8 bg-red-200 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </div>
+              <span>ログアウト</span>
+            </button>
           </div>
         </div>
       )}
+
 
       {/* Add custom animations */}
       <style jsx global>{`

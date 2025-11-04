@@ -84,7 +84,7 @@ const SigninForm = () => {
       {/* Main Card */}
       <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 transition-all duration-500 hover:shadow-3xl relative overflow-hidden">
         {/* Background Glow Effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl opacity-20 blur-lg animate-pulse"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl opacity-20 blur-lg"></div>
         
         {/* Content */}
         <div className="relative">

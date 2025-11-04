@@ -29,7 +29,7 @@ export default function AdminPage() {
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
       <div className="max-w-4xl mx-auto text-center w-full mt-5">
         {/* Welcome Card with Glass Effect */}
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-12 transform transition-all duration-500 hover:shadow-3xl relative overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-12 hover:shadow-3xl relative overflow-hidden">
           {/* Background Glow Effect */}
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl opacity-20 blur-lg"></div>
           
