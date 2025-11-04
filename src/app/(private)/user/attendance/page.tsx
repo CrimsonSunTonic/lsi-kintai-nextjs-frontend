@@ -54,20 +54,17 @@ export default function AttendancePage() {
 
     if (result.success) {
       notify("success", "成功", result.message);
-      switch (status) {
-        case "checkin":
-          setCheckedIn(true);
-          break;
-        case "checkout":
-          setCheckedOut(true);
-          break;
-        case "lunchin":
-          setLunchIn(true);
-          break;
-        case "lunchout":
-          setLunchOut(true);
-          break;
-      }
+      fetchAttendanceStatus()
+        .then((status) => {
+          setCheckedIn(status.checkedIn);
+          setCheckedOut(status.checkedOut);
+          setLunchIn(status.lunchIn);
+          setLunchOut(status.lunchOut);
+        })
+        .catch(() => {
+          notify("error", "エラー", "ステータスの取得に失敗しました。");
+        })
+        .finally(() => setInitialLoading(false));
     } else {
       notify("error", "エラー", result.message);
     }
@@ -76,16 +73,11 @@ export default function AttendancePage() {
     setActiveButton(null);
   };
 
-  // --- Simplified logic flags ---
-  const isWorking = checkedIn && !checkedOut;
-  const isLunching = lunchIn && !lunchOut;
-  const isFinished = checkedOut;
-
   // --- Disable logic (cleaner & readable) ---
-  const disableCheckIn = loading || checkedIn || isWorking || isLunching || isFinished;
-  const disableLunchIn = loading || !isWorking || isLunching || lunchIn;
-  const disableLunchOut = loading || !lunchIn || lunchOut || isFinished;
-  const disableCheckOut = loading || !checkedIn || isLunching || isFinished;
+  const disableCheckIn = loading || !checkedIn
+  const disableLunchIn = loading || !lunchIn
+  const disableLunchOut = loading || !lunchOut
+  const disableCheckOut = loading || !checkedOut
 
   if (initialLoading)
     return (
