@@ -27,6 +27,7 @@ export default function AdminUsersPage() {
     async function load() {
       try {
         const data = await getAllUsersClient();
+        
         setUsers(data);
       } catch {
         console.error("Failed to load users");
@@ -130,12 +131,12 @@ export default function AdminUsersPage() {
             <div className="flex items-center justify-between">
               <div className="flex space-x-6">
                 <div className="flex items-center space-x-2 text-gray-700">
-                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                  <span className="text-sm">総社員: <strong>{users.length}</strong> 名</span>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <span className="text-sm">管理者: <strong>{users.filter(u => u.role === '管理者').length}</strong> 名</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-700">
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <span className="text-sm">管理者: <strong>{users.filter(u => u.role === 'ADMIN').length}</strong> 名</span>
+                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                  <span className="text-sm">総社員: <strong>{users.filter(u => u.role === '社員').length}</strong> 名</span>
                 </div>
               </div>
               

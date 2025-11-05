@@ -132,7 +132,7 @@ const AppHeader = ({ user }: { user: UserData }) => {
                     {user.firstname.charAt(0)}
                   </div>
                 </div>
-                <span className="text-white font-medium drop-shadow-sm">
+                <span className="text-white font-medium drop-shadow-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">
                   {user.firstname} {user.lastname}
                 </span>
                 <svg 
@@ -157,7 +157,7 @@ const AppHeader = ({ user }: { user: UserData }) => {
                   <div className="relative">
                     {/* User Info */}
                     <div className="px-4 py-3 border-b border-gray-200/60 relative z-10">
-                      <p className="text-sm font-semibold text-gray-900">{user.firstname} {user.lastname}</p>
+                      <p className="text-sm font-semibold text-gray-900 mr-[60px] whitespace-nowrap overflow-hidden text-ellipsis">{user.firstname} {user.lastname}</p>
                       <p className="text-xs text-gray-600 mt-1">{user.email}</p>
                       <div className="absolute top-0 right-0 mt-2 mr-3">
                         <span className="text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-full backdrop-blur-sm border border-white/20 shadow-sm">

@@ -19,7 +19,7 @@ export default function DataTable<T extends { [key: string]: any }>({
   data,
   columns,
   onRowClick,
-  rowsPerPageOptions = [5, 10, 20],
+  rowsPerPageOptions = [10, 20, 50, 100],
 }: DataTableProps<T>) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
@@ -182,7 +182,7 @@ export default function DataTable<T extends { [key: string]: any }>({
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between mt-8 px-2">
+        <div className="flex items-center justify-between gap-4 mt-8 px-2 md:flex-row flex-col-reverse">
           <div className="text-sm text-gray-700 backdrop-blur-sm bg-white/50 rounded-lg px-3 py-2 border border-white/30">
             全 <span className="font-semibold text-gray-800">{sortedData.length}</span> 件中 
             <span className="font-semibold text-gray-800 mx-1">{page * rowsPerPage + 1}</span> - 

@@ -51,7 +51,7 @@ export default function PrivateLayout({
       </div>
 
       {user && <AppHeader user={user} />}
-      <main className="pt-16 relative z-10 min-h-[calc(100vh-4rem)] p-6">
+      <main className="pt-16 relative min-h-[calc(100vh-4rem)] p-6">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

@@ -154,33 +154,7 @@ export default function UserRecordsPage() {
       {/* Controls with Glass Effect */}
       <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 mb-6">
         <div className="flex flex-col lg:flex-row gap-4 items-end">
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* User Select */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                社員選択
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedUser}
-                  onChange={(e) => setSelectedUser(Number(e.target.value))}
-                  className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-300 bg-white/80 text-gray-800 appearance-none cursor-pointer hover:border-purple-300 shadow-sm hover:shadow-md backdrop-blur-sm"
-                >
-                  <option value="" className="text-gray-400">社員を選択</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id} className="text-gray-800 py-2">
-                      {u.firstname} {u.lastname}
-                    </option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                  <svg className="w-5 h-5 text-purple-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
+          <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
             {/* Month Select */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -190,7 +164,7 @@ export default function UserRecordsPage() {
                 <select
                   value={month}
                   onChange={(e) => setMonth(Number(e.target.value))}
-                  className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 bg-white/80 text-gray-800 appearance-none cursor-pointer hover:border-blue-300 shadow-sm hover:shadow-md backdrop-blur-sm"
+                  className="w-full px-4 py-3.5 pr-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 bg-white/80 text-gray-800 appearance-none cursor-pointer hover:border-blue-300 shadow-sm hover:shadow-md backdrop-blur-sm"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                     <option key={m} value={m} className="text-gray-800 py-2">
@@ -215,7 +189,7 @@ export default function UserRecordsPage() {
                 <select
                   value={year}
                   onChange={(e) => setYear(Number(e.target.value))}
-                  className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all duration-300 bg-white/80 text-gray-800 appearance-none cursor-pointer hover:border-green-300 shadow-sm hover:shadow-md backdrop-blur-sm"
+                  className="w-full px-4 py-3.5 pr-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all duration-300 bg-white/80 text-gray-800 appearance-none cursor-pointer hover:border-green-300 shadow-sm hover:shadow-md backdrop-blur-sm"
                 >
                   {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((y) => (
                     <option key={y} value={y} className="text-gray-800 py-2">
@@ -225,6 +199,32 @@ export default function UserRecordsPage() {
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <svg className="w-5 h-5 text-green-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            {/* User Select */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                社員選択
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedUser}
+                  onChange={(e) => setSelectedUser(Number(e.target.value))}
+                  className="w-full px-4 py-3.5 pr-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-300 bg-white/80 text-gray-800 appearance-none cursor-pointer hover:border-purple-300 shadow-sm hover:shadow-md backdrop-blur-sm"
+                >
+                  <option value="" className="text-gray-400">社員を選択</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id} className="text-gray-800 py-2">
+                      {u.firstname} {u.lastname}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg className="w-5 h-5 text-purple-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>

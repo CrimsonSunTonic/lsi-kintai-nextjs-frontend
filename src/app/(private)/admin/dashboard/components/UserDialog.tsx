@@ -49,9 +49,9 @@ export default function UserDialog({ open, loadingSave, onClose, onSubmit, editi
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+    <div className="fixed inset-0 overflow-x-auto bg-opacity-30 backdrop-blur-sm flex justify-center p-4 z-50 animate-fadeIn">
       <div 
-        className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform animate-scaleIn"
+        className="bg-white mt-auto mb-auto h-fit rounded-2xl shadow-2xl max-w-md w-full transform animate-scaleIn"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
         <div className="p-6 border-b border-gray-200">
