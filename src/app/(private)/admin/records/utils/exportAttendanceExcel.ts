@@ -1,6 +1,5 @@
 import ExcelJS from "exceljs";
-import { GroupedRecord } from "../components/AttendanceTable";
-import { calcWorkTimes } from "./attendanceUtils";
+import { GroupedRecord } from "./attendanceUtils";
 
 interface User {
   id: number;
@@ -52,34 +51,40 @@ export async function exportAttendanceExcel(
     const day = rec.day;
     let row = startRow + (day - 1);
 
+    // Bù dòng trống trong form Excel (nếu có)
     if (day > 20) row += 2;
     else if (day > 10) row += 1;
 
-    const { actual, normalOt, midnightOt } = calcWorkTimes(
-      rec.checkin || "",
-      rec.checkout || "",
-      rec.weekday
-    );
+    const data = rec.data;
+    if (!data) continue;
 
-    const inLocation = rec.checkinLoc
-      ? `${mapUrl}${rec.checkinLoc[0]},${rec.checkinLoc[1]}`
-      : "";
-    const outLocation = rec.checkoutLoc
-      ? `${mapUrl}${rec.checkoutLoc[0]},${rec.checkoutLoc[1]}`
-      : "";
+    // ✅ Nhiều thời gian checkin / checkout
+    const checkinTimes =
+      data.checkin?.map((c) => c.time).join("\n") || "";
+    const checkoutTimes =
+      data.checkout?.map((c) => c.time).join("\n") || "";
 
-    sheet.getCell(`E${row}`).value = rec.checkin || "";
-    sheet.getCell(`F${row}`).value = rec.checkout || "";
-    sheet.getCell(`G${row}`).value = actual || "";
-    sheet.getCell(`H${row}`).value = normalOt || "";
-    sheet.getCell(`I${row}`).value = midnightOt || "";
+    // ✅ Lấy tọa độ đầu tiên (nếu có)
+    const inLocation = data.checkin?.map((c) => `${mapUrl}${c.loc[0]},${c.loc[1]}`).join("\n") || "";
+    const outLocation = data.checkout?.map((c) => `${mapUrl}${c.loc[0]},${c.loc[1]}`).join("\n") || "";
+
+    // ✅ Ghi vào file Excel
+    sheet.getCell(`E${row}`).value = checkinTimes;
+    sheet.getCell(`F${row}`).value = checkoutTimes;
+    sheet.getCell(`G${row}`).value = data.workingHours || "";
+
+    // ✅ Bật xuống dòng trong ô (wrap text)
+    sheet.getCell(`E${row}`).alignment = { wrapText: true };
+    sheet.getCell(`F${row}`).alignment = { wrapText: true };
+
     sheet.getCell(`AC${row}`).value = inLocation;
     sheet.getCell(`AD${row}`).value = outLocation;
 
+    // ✅ Công thức tính giờ tổng (ví dụ)
     sheet.getCell(`AZ${row}`).value = { formula: `=G${row}` };
   }
 
-  // ✅ Export Excel & trigger download manually
+  // ✅ Xuất file Excel
   const filename = `LSI勤務表_${year}${String(month).padStart(2, "0")}_${userName}.xlsx`;
   const buffer = await workbook.xlsx.writeBuffer();
 

@@ -99,7 +99,7 @@ export default function UserRecordsPage() {
   // ✅ Export Excel
   const handleExportExcel = () => {
     if (records.length === 0 || !selectedUser) return;
-    // exportAttendanceExcel(records, users, selectedUser, year, month);
+    exportAttendanceExcel(records, users, selectedUser, year, month);
   };
 
   if (authLoading) {
