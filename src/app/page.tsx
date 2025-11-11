@@ -24,7 +24,7 @@ export default function HomePage() {
         if (user.role === "ADMIN") {
           router.replace("/admin/");
         } else {
-          router.replace("/user/");
+          router.replace("/user/attendance");
         }
       } else {
         // invalid token → redirect to signin

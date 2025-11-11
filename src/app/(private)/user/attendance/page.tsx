@@ -9,7 +9,6 @@ import { notify } from "@/utils/sweetalertHelp";
 type StatusKey = "checkin" | "checkout" | "lunchin" | "lunchout";
 
 export default function AttendancePage() {
-  const [record, setRecord] = useState<Attendance | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeButton, setActiveButton] = useState<StatusKey | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -49,13 +48,13 @@ export default function AttendancePage() {
     setActiveButton(type);
 
     const result = await handleAttendanceAction(type);
-    setRecord(result.record);
 
     if (result.success) {
       notify("success", "成功", result.message);
       await refreshStatus();
     } else {
       notify("error", "エラー", result.message);
+      await refreshStatus();
     }
 
     setLoading(false);
@@ -128,8 +127,9 @@ export default function AttendancePage() {
               <AttendanceButton
                 type="checkin"
                 label="出勤"
+                description="業務開始"
                 color="green"
-                active={status.checkedIn}
+                active={true}
                 loading={loading && activeButton === "checkin"}
                 disabled={disable.checkin}
                 onClick={() => handleAttendance("checkin")}
@@ -137,8 +137,9 @@ export default function AttendancePage() {
               <AttendanceButton
                 type="lunchin"
                 label="昼食入り"
+                description="休憩開始"
                 color="yellow"
-                active={status.lunchIn}
+                active={true}
                 loading={loading && activeButton === "lunchin"}
                 disabled={disable.lunchin}
                 onClick={() => handleAttendance("lunchin")}
@@ -146,8 +147,9 @@ export default function AttendancePage() {
               <AttendanceButton
                 type="lunchout"
                 label="昼食戻り"
+                description="休憩終了"
                 color="blue"
-                active={status.lunchOut}
+                active={true}
                 loading={loading && activeButton === "lunchout"}
                 disabled={disable.lunchout}
                 onClick={() => handleAttendance("lunchout")}
@@ -155,8 +157,9 @@ export default function AttendancePage() {
               <AttendanceButton
                 type="checkout"
                 label="退勤"
+                description="業務終了"
                 color="red"
-                active={status.checkedOut}
+                active={true}
                 loading={loading && activeButton === "checkout"}
                 disabled={disable.checkout}
                 onClick={() => handleAttendance("checkout")}
@@ -175,12 +178,14 @@ export default function AttendancePage() {
   );
 }
 
+
 /* ------------------------ */
 /* Reusable Button Component */
 /* ------------------------ */
 function AttendanceButton({
   type,
   label,
+  description,
   color,
   active,
   loading,
@@ -189,6 +194,7 @@ function AttendanceButton({
 }: {
   type: StatusKey;
   label: string;
+  description: string;
   color: "green" | "yellow" | "blue" | "red";
   active: boolean;
   loading: boolean;
@@ -196,57 +202,86 @@ function AttendanceButton({
   onClick: () => void;
 }) {
   const colorMap = {
-    green: "from-green-500 to-emerald-600",
-    yellow: "from-yellow-500 to-orange-600",
-    blue: "from-blue-500 to-cyan-600",
-    red: "from-red-500 to-pink-600",
+    green: "from-green-500 to-emerald-600 shadow-green-200",
+    yellow: "from-amber-500 to-orange-500 shadow-amber-200",
+    blue: "from-blue-500 to-cyan-600 shadow-blue-200",
+    red: "from-red-500 to-pink-600 shadow-red-200",
   }[color];
 
-  const activeBorder = {
-    green: "border-green-500 text-green-700 bg-green-50/80 hover:bg-green-100/80",
-    yellow: "border-yellow-500 text-yellow-700 bg-yellow-50/80 hover:bg-yellow-100/80",
-    blue: "border-blue-500 text-blue-700 bg-blue-50/80 hover:bg-blue-100/80",
-    red: "border-red-500 text-red-700 bg-red-50/80 hover:bg-red-100/80",
-  }[color];
+  const iconMap = {
+    checkin: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+    ),
+    checkout: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+      </svg>
+    ),
+    lunchin: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    lunchout: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  };
+
+  if (disabled) {
+    return (
+      <div className="w-full py-4 px-6 rounded-2xl font-semibold text-gray-400 bg-gray-100/80 border border-gray-200 cursor-not-allowed flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-gray-200 rounded-xl flex items-center justify-center">
+            {iconMap[type]}
+          </div>
+          <div className="text-left">
+            <div className="font-semibold text-gray-400">{label}</div>
+            <div className="text-xs text-gray-400">{description}</div>
+          </div>
+        </div>
+        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full py-4 px-6 rounded-2xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-2 relative overflow-hidden group ${
-        disabled
-          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-          : active
-          ? `border-2 ${activeBorder} backdrop-blur-sm`
-          : `bg-gradient-to-r ${colorMap} text-white hover:brightness-110 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5`
+      className={`w-full py-4 px-6 rounded-2xl font-semibold text-white transition-all duration-300 flex items-center justify-between relative overflow-hidden group ${
+        active 
+          ? `bg-gradient-to-r ${colorMap} shadow-lg hover:shadow-xl hover:brightness-110 transform hover:-translate-y-0.5` 
+          : "bg-gray-400/80 cursor-not-allowed"
       }`}
     >
-      {!disabled && !active && (
+      {/* Shine Effect */}
+      {active && (
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
       )}
-      {loading ? (
-        <>
-          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          <span>処理中...</span>
-        </>
-      ) : (
-        <>
-          {type === "checkin" ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-          ) : type === "checkout" ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
+      
+      {/* Content */}
+      <div className="flex items-center space-x-3">
+        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+          active ? "bg-white/20" : "bg-gray-500/50"
+        }`}>
+          {loading ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            iconMap[type]
           )}
-          <span>{label}</span>
-        </>
-      )}
+        </div>
+        <div className="text-left">
+          <div className="font-semibold">{label}</div>
+          <div className="text-xs text-white/80 font-normal">{description}</div>
+        </div>
+      </div>
+
+      {/* Status Dot */}
+      <div className={`w-2 h-2 rounded-full ${active ? "bg-white/40" : "bg-gray-300"}`}></div>
     </button>
   );
 }
