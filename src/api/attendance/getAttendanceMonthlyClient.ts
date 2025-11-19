@@ -19,7 +19,14 @@ export async function getAttendanceMonthlyClient(
   }, "application/x-www-form-urlencoded");
 
   console.log(data);
-  
 
   return data;
 }
+
+export async function updateAttendanceFromkMonthlyData (id: number, newTime: string) {
+  const data = await apiClient(`${API_BASE}/attendance/update-monthly`, {
+      method: "PATCH",
+      body: JSON.stringify({ id, newTime }),
+    });
+    return data;
+};

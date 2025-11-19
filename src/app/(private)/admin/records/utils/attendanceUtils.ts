@@ -7,6 +7,7 @@
 // }
 
 export interface AttendanceEvent {
+  id: number;
   time: string; // "13:38" v.v...
   loc: [number, number]; // [latitude, longitude]
 }
@@ -16,7 +17,7 @@ export interface DailyAttendance {
   checkout?: AttendanceEvent[];
   lunchin?: AttendanceEvent[];
   lunchout?: AttendanceEvent[];
-  workingHours?: number;
+  workingHours?: WorkingHours;
 }
 
 export type AttendanceRecord = Record<string, DailyAttendance>;
@@ -32,6 +33,12 @@ export interface GroupedRecord {
   day: number;
   weekday: string;
   data?: DailyAttendance;
+}
+
+export interface WorkingHours {
+  main: number;
+  ot1: number;
+  ot2: number;
 }
 
 export function parseTime(str: string) {

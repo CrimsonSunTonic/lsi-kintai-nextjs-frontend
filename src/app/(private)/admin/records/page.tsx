@@ -6,8 +6,9 @@ import { getAllUsersClient } from "@/api/user/getAllUsersClient";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import AttendanceTable from "./components/AttendanceTable";
 import MapDialog from "./components/MapDialog";
+import EditAttendanceDialog from "./components/EditAttendanceDialog";
 import { exportAttendanceExcel } from "./utils/exportAttendanceExcel";
-import { AttendanceRecord, User, GroupedRecord } from "./utils/attendanceUtils";
+import { AttendanceRecord, User, GroupedRecord, DailyAttendance, AttendanceEvent } from "./utils/attendanceUtils";
 
 export default function UserRecordsPage() {
   const { user, loading: authLoading } = useAdminAuth();
@@ -28,8 +29,111 @@ export default function UserRecordsPage() {
     time?: string;
   } | null>(null);
 
+  // ✏️ Edit state
+  const [editMode, setEditMode] = useState<'view' | 'add' | 'edit' | 'delete'>('view');
+  const [editingRecord, setEditingRecord] = useState<{
+    date: string;
+    type: 'checkin' | 'checkout' | 'lunchin' | 'lunchout';
+    event?: AttendanceEvent;
+    dayData?: DailyAttendance;
+  } | null>(null);
+
   const handleShowMap = (lat: number, lng: number, label?: string, time?: string) => {
+    if (editMode !== 'view') return; // Only show map in view mode
     setSelectedLocation({ lat, lng, label, time });
+  };
+
+  const handleEditRecord = (
+    date: string, 
+    type: 'checkin' | 'checkout' | 'lunchin' | 'lunchout', 
+    event?: AttendanceEvent,
+    dayData?: DailyAttendance
+  ) => {
+    if (editMode === 'view') return;
+    
+    setEditingRecord({
+      date,
+      type,
+      event,
+      dayData
+    });
+  };
+
+  const handleAddRecord = (
+    date: string, 
+    type: 'checkin' | 'checkout' | 'lunchin' | 'lunchout',
+    dayData?: DailyAttendance
+  ) => {
+    if (editMode !== 'add') return;
+    
+    setEditingRecord({
+      date,
+      type,
+      dayData
+    });
+  };
+
+  const handleSaveRecord = (updatedEvent: AttendanceEvent) => {
+    if (!editingRecord) return;
+
+    const { date, type, event } = editingRecord;
+    
+    setRecords(prev => prev.map(record => {
+      const recordDate = `${year}-${String(month).padStart(2, "0")}-${String(record.day).padStart(2, "0")}`;
+      
+      if (recordDate === date) {
+        const currentData = record.data || {};
+        const currentEvents = currentData[type] || [];
+
+        let updatedEvents: AttendanceEvent[];
+        
+        if (editMode === 'add') {
+          // Add new event
+          updatedEvents = [...currentEvents, updatedEvent];
+        } else if (editMode === 'edit' && event) {
+          // Edit existing event
+          updatedEvents = currentEvents.map(ev => 
+            ev.id === event.id ? updatedEvent : ev
+          );
+        } else if (editMode === 'delete' && event) {
+          // Delete event
+          updatedEvents = currentEvents.filter(ev => ev.id !== event.id);
+        } else {
+          updatedEvents = currentEvents;
+        }
+
+        return {
+          ...record,
+          data: {
+            ...currentData,
+            [type]: updatedEvents.length > 0 ? updatedEvents : undefined
+          }
+        };
+      }
+      return record;
+    }));
+
+    setEditingRecord(null);
+  };
+
+  const handleDeleteDay = (date: string) => {
+    if (editMode !== 'delete') return;
+
+    if (!confirm('この日の全ての勤怠データを削除しますか？この操作は元に戻せません。')) {
+      return;
+    }
+
+    setRecords(prev => prev.map(record => {
+      const recordDate = `${year}-${String(month).padStart(2, "0")}-${String(record.day).padStart(2, "0")}`;
+      
+      if (recordDate === date) {
+        return {
+          ...record,
+          data: undefined
+        };
+      }
+      return record;
+    }));
   };
 
   // ✅ Fetch all users
@@ -69,6 +173,7 @@ export default function UserRecordsPage() {
 
     setError(null);
     setDataLoading(true);
+    setEditMode('view'); // Reset to view mode when fetching new data
 
     try {
       const data: AttendanceRecord = await getAttendanceMonthlyClient(selectedUser, month, year);
@@ -95,8 +200,7 @@ export default function UserRecordsPage() {
     }
   };
 
-
-  // ✅ Export Excel
+  // Export Excel
   const handleExportExcel = () => {
     if (records.length === 0 || !selectedUser) return;
     exportAttendanceExcel(records, users, selectedUser, year, month);
@@ -232,7 +336,7 @@ export default function UserRecordsPage() {
             </div>
           </div>
 
-          {/* Buttons remain the same */}
+          {/* Buttons */}
           <div className="flex gap-3">
             <button
               onClick={handleFetch}
@@ -268,7 +372,6 @@ export default function UserRecordsPage() {
         </div>
       </div>
 
-
       {/* Error Alert */}
       {error && (
         <div className="bg-yellow-50/80 backdrop-blur-sm border-2 border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl mb-6 transition-all duration-300">
@@ -281,19 +384,125 @@ export default function UserRecordsPage() {
         </div>
       )}
 
+      {/* Edit Mode Controls */}
+      {!error && records.length > 0 && (
+        <div className="bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/30 p-6 mb-6 relative overflow-hidden">
+          {/* Background decorative elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+          
+          <div className="relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              {/* Title Section */}
+              <div className="text-center lg:text-left">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  {selectedUserName}
+                </h3>
+                <p className="text-gray-600 font-medium">
+                  {year}年{month}月の勤務表
+                </p>
+              </div>
+
+              {/* Mode Buttons */}
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  onClick={() => setEditMode('view')}
+                  className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 min-w-[100px] justify-center ${
+                    editMode === 'view' 
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' 
+                      : 'bg-white/80 text-gray-600 hover:bg-white hover:shadow-md border border-gray-200'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <span>閲覧</span>
+                </button>
+                
+                <button
+                  onClick={() => setEditMode('add')}
+                  className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 min-w-[100px] justify-center ${
+                    editMode === 'add' 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25' 
+                      : 'bg-white/80 text-gray-600 hover:bg-white hover:shadow-md border border-gray-200'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>追加</span>
+                </button>
+                
+                <button
+                  onClick={() => setEditMode('edit')}
+                  className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 min-w-[100px] justify-center ${
+                    editMode === 'edit' 
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/25' 
+                      : 'bg-white/80 text-gray-600 hover:bg-white hover:shadow-md border border-gray-200'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>更新</span>
+                </button>
+                
+                <button
+                  onClick={() => setEditMode('delete')}
+                  className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 min-w-[100px] justify-center ${
+                    editMode === 'delete' 
+                      ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/25' 
+                      : 'bg-white/80 text-gray-600 hover:bg-white hover:shadow-md border border-gray-200'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>削除</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Mode Instructions */}
+            {editMode !== 'view' && (
+              <div className="mt-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4">
+                <div className="flex items-start">
+                  <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
+                    editMode === 'add' ? 'bg-green-100 text-green-600' :
+                    editMode === 'edit' ? 'bg-amber-100 text-amber-600' :
+                    'bg-red-100 text-red-600'
+                  }`}>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className={`font-semibold text-sm ${
+                      editMode === 'add' ? 'text-green-800' :
+                      editMode === 'edit' ? 'text-amber-800' :
+                      'text-red-800'
+                    }`}>
+                      {editMode === 'add' && '追加モード'}
+                      {editMode === 'edit' && '更新モード'}
+                      {editMode === 'delete' && '削除モード'}
+                    </p>
+                    <p className="text-amber-700 text-sm mt-1">
+                      {editMode === 'add' && '空のセルをクリックして新しい勤怠記録を追加できます。出勤・退勤は複数回追加可能です。'}
+                      {editMode === 'edit' && '既存の勤怠記録をクリックして時間や位置を編集できます。'}
+                      {editMode === 'delete' && '記録をクリックして個別削除、または日付セルをクリックして全日削除できます。'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Results */}
       {!error && records.length > 0 && (
         <div className="space-y-6">
-          {/* Header with Glass Effect */}
-          <div className="bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/30 p-8 text-center relative overflow-hidden">
-            {/* Background decorative elements */}
-            <div className="absolute top-0 left-0 w-32 h-32 bg-purple-500/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-xl"></div>
-            <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full translate-x-1/3 translate-y-1/3 blur-xl"></div>
-            
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2 relative z-10">
-              {selectedUserName} {year}年{month}月の勤務表
-            </h2>
-          </div>
 
           {/* Table Container with Glass Effect */}
           <div className="bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/30 p-6 relative overflow-hidden">
@@ -301,7 +510,16 @@ export default function UserRecordsPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-[length:20px_20px] opacity-30"></div>
             
             <div className="relative z-10">
-              <AttendanceTable records={records} onShowMap={handleShowMap} />
+              <AttendanceTable 
+                records={records} 
+                onShowMap={handleShowMap}
+                onEditRecord={handleEditRecord}
+                onAddRecord={handleAddRecord}
+                onDeleteDay={handleDeleteDay}
+                editMode={editMode}
+                year={year}
+                month={month}
+              />
             </div>
           </div>
         </div>
@@ -326,6 +544,15 @@ export default function UserRecordsPage() {
 
       {/* Map Dialog */}
       <MapDialog location={selectedLocation} onClose={() => setSelectedLocation(null)} />
+
+      {/* Edit Attendance Dialog */}
+      <EditAttendanceDialog
+        isOpen={!!editingRecord}
+        onClose={() => setEditingRecord(null)}
+        onSave={handleSaveRecord}
+        record={editingRecord}
+        mode={editMode}
+      />
     </div>
   );
 }
